@@ -22,6 +22,20 @@ int main()
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
+	PrimaryClick();
+
+	for (int i = 0; i < 10; i++)
+	{
+		if (i % 2 == 1)
+		{
+			VerticalScroll(120);
+		}
+		else
+		{
+			VerticalScroll(-120);
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	}
 
   return 0;
 }

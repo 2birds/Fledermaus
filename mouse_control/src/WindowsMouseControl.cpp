@@ -3,30 +3,90 @@
 
 bool MoveMouse(int x, int y)
 {
-	POINT cursorPos;
-	if (!GetCursorPos(&cursorPos))
-	{
-		return false;
-	}
-
-	if (!SetCursorPos(cursorPos.x + x, cursorPos.y + y))
-	{
-		return false;
-	}
-
+	INPUT input;
+	input.type = INPUT_MOUSE;
+	input.mi.mouseData = 0;
+	input.mi.dx = x;
+	input.mi.dy = y;
+	input.mi.dwFlags = MOUSEEVENTF_MOVE;
+	SendInput(1, &input, sizeof(input));
 	return true;
+}
+
+bool IssueClick(DWORD flags)
+{
+	INPUT input;
+	input.type = INPUT_MOUSE;
+	input.mi.time = 0;
+	input.mi.mouseData = 0;
+	input.mi.dx = 0;
+	input.mi.dy = 0;
+	input.mi.dwFlags = flags;
+	input.mi.mouseData = 0;
+	input.mi.dwExtraInfo = NULL;
+
+	SendInput(1, &input, sizeof(input));
+	return true;
+}
+
+bool PrimaryDown()
+{
+	return IssueClick(MOUSEEVENTF_LEFTDOWN);
+}
+
+bool PrimaryUp()
+{
+	return IssueClick(MOUSEEVENTF_LEFTDOWN);
 }
 
 bool PrimaryClick()
 {
-	mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-	mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-	return true;
+	return IssueClick(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP);
+}
+
+bool SecondaryDown()
+{
+	return IssueClick(MOUSEEVENTF_RIGHTDOWN);
+}
+
+bool SecondaryUp()
+{
+	return IssueClick(MOUSEEVENTF_RIGHTUP);
 }
 
 bool SecondaryClick()
 {
-	mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
-	mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+	return IssueClick(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP);
+}
+
+bool MiddleClick()
+{
+        return IssueClick(MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_MIDDLEUP);
+}
+
+bool MiddleDown()
+{
+        return IssueClick(MOUSEEVENTF_MIDDLEDOWN);
+}
+
+bool MiddleUp()
+{
+        return IssueClick(MOUSEEVENTF_MIDDLEUP);
+}
+
+bool VerticalScroll(int wheelAmt)
+{
+        DWORD amt = static_cast<DWORD>(wheelAmt);
+	INPUT input;
+	input.type = INPUT_MOUSE;
+	input.mi.time = 0;
+	input.mi.mouseData = 0;
+	input.mi.dx = 0;
+	input.mi.dy = 0;
+	input.mi.dwFlags = MOUSEEVENTF_WHEEL;
+	input.mi.mouseData = amt;
+	input.mi.dwExtraInfo = NULL;
+
+	SendInput(1, &input, sizeof(input));
 	return true;
 }
