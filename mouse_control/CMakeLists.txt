@@ -10,6 +10,10 @@ if (UNIX)
   list(APPEND
 		   MOUSE_CONTROL_SRCS
 			"src/LinuxMouseControl.cpp")
+elseif(WIN32)
+  list(APPEND
+		   MOUSE_CONTROL_SRCS
+		   "src/WindowsMouseControl.cpp")
 endif()
 
 add_library(mouse_control
@@ -19,6 +23,9 @@ target_include_directories(mouse_control
 	                         PUBLIC
 													 ${CMAKE_CURRENT_SOURCE_DIR}/include)
 	          
-target_link_libraries(mouse_control
-                      PRIVATE
-                      X11)
+if (UNIX)
+	target_link_libraries(mouse_control
+		PRIVATE
+		X11)
+elseif(WIN32)
+endif()
