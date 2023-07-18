@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.0)
 project(Fledermouse VERSION 1.0.0.0)
 
-find_package(X11 REQUIRED)
 
 set(MOUSE_CONTROL_SRCS
 	  "include/MouseControl.h")
 
 if (UNIX)
+  find_package(X11 REQUIRED)
   list(APPEND
 		   MOUSE_CONTROL_SRCS
 			"src/LinuxMouseControl.cpp")

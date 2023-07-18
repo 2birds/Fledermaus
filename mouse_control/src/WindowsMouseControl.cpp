@@ -36,7 +36,7 @@ bool PrimaryDown()
 
 bool PrimaryUp()
 {
-	return IssueClick(MOUSEEVENTF_LEFTDOWN);
+	return IssueClick(MOUSEEVENTF_LEFTUP);
 }
 
 bool PrimaryClick()
