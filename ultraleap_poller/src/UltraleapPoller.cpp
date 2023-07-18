@@ -398,6 +398,20 @@ bool UltraleapPoller::isPinching(const LEAP_HAND* hand) const
 	return hand->pinch_strength > pinchThreshold_;
 }
 
+bool UltraleapPoller::isMiddlePinching(const LEAP_HAND* hand) const
+{
+	return distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) < middlePinchThreshold_ &&
+	       distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint) > middlePinchThreshold_ &&
+	       distance(hand->ring.distal.next_joint, hand->thumb.distal.next_joint) > middlePinchThreshold_;
+}
+
+bool UltraleapPoller::isRingPinching(const LEAP_HAND* hand) const
+{
+	return distance(hand->ring.distal.next_joint, hand->thumb.distal.next_joint) <  ringPinchThreshold_;
+	       distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint) > ringPinchThreshold_ &&
+	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) >  ringPinchThreshold_;
+}
+
 bool UltraleapPoller::isFist(const LEAP_HAND* hand) const
 {
 	return hand->grab_strength > fistThreshold_;
