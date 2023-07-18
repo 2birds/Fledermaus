@@ -23,6 +23,7 @@ if (UNIX)
     find_package(Threads REQUIRED)    
 endif (UNIX)
 add_subdirectory(mouse_control)
+add_subdirectory(ultraleap_poller)
 
 set(Fledermaus_SRCS
     "main.cpp")
@@ -34,4 +35,5 @@ target_link_libraries(${PROJECT_NAME}
      PUBLIC
      LeapSDK::LeapC
      PRIVATE
-     mouse_control)
+     mouse_control
+     ultraleap_poller)
