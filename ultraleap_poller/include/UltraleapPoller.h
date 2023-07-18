@@ -50,7 +50,9 @@ class UltraleapPoller
 		float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
 
 		bool isPinching(const LEAP_HAND* hand) const;
-		bool isFist(const LEAP_HAND* hand) const;
+		bool isMiddlePinching(const LEAP_HAND *hand) const;
+		bool isRingPinching(const LEAP_HAND *hand) const;
+		bool isFist(const LEAP_HAND *hand) const;
 		bool isV(const LEAP_HAND* hand) const;
 
 		void handleDeviceMessage(const LEAP_DEVICE_EVENT *device_event);
@@ -63,6 +65,8 @@ class UltraleapPoller
 	private:
 		bool pollerRunning_ = false;
 		const float pinchThreshold_ =  0.85f;
+		const float middlePinchThreshold_ =  15.f;
+		const float ringPinchThreshold_ =  15.f;
 		const float fistThreshold_ =  0.9f;
 
 		position_callback_t positionCallback_;
