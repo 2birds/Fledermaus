@@ -23,6 +23,22 @@ class UltraleapPoller
 		void SetOnPinchContinueCallback(gesture_callback_t callback);
 		void SetOnPinchStopCallback(gesture_callback_t callback);
 
+		void SetOnIndexPinchStartCallback(gesture_callback_t callback);
+		void SetOnIndexPinchContinueCallback(gesture_callback_t callback);
+		void SetOnIndexPinchStopCallback(gesture_callback_t callback);
+
+		void SetOnMiddlePinchStartCallback(gesture_callback_t callback);
+		void SetOnMiddlePinchContinueCallback(gesture_callback_t callback);
+		void SetOnMiddlePinchStopCallback(gesture_callback_t callback);
+
+		void SetOnRingPinchStartCallback(gesture_callback_t callback);
+		void SetOnRingPinchContinueCallback(gesture_callback_t callback);
+		void SetOnRingPinchStopCallback(gesture_callback_t callback);
+
+		void SetOnPinkyPinchStartCallback(gesture_callback_t callback);
+		void SetOnPinkyPinchContinueCallback(gesture_callback_t callback);
+		void SetOnPinkyPinchStopCallback(gesture_callback_t callback);
+
 		void SetOnFistStartCallback(gesture_callback_t callback);
 		void SetOnFistContinueCallback(gesture_callback_t callback);
 		void SetOnFistStopCallback(gesture_callback_t callback);
@@ -37,6 +53,22 @@ class UltraleapPoller
 		void ClearOnPinchContinueCallback();
 		void ClearOnPinchStopCallback();
 
+		void ClearOnIndexPinchStartCallback();
+		void ClearOnIndexPinchContinueCallback();
+		void ClearOnIndexPinchStopCallback();
+
+		void ClearOnMiddlePinchStartCallback();
+		void ClearOnMiddlePinchContinueCallback();
+		void ClearOnMiddlePinchStopCallback();
+
+		void ClearOnRingPinchStartCallback();
+		void ClearOnRingPinchContinueCallback();
+		void ClearOnRingPinchStopCallback();
+
+		void ClearOnPinkyPinchStartCallback();
+		void ClearOnPinkyPinchContinueCallback();
+		void ClearOnPinkyPinchStopCallback();
+
 		void ClearOnFistStartCallback();
 		void ClearOnFistContinueCallback();
 		void ClearOnFistStopCallback();
@@ -50,8 +82,10 @@ class UltraleapPoller
 		float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
 
 		bool isPinching(const LEAP_HAND* hand) const;
+		bool isIndexPinching(const LEAP_HAND* hand) const;
 		bool isMiddlePinching(const LEAP_HAND *hand) const;
 		bool isRingPinching(const LEAP_HAND *hand) const;
+		bool isPinkyPinching(const LEAP_HAND *hand) const;
 		bool isFist(const LEAP_HAND *hand) const;
 		bool isV(const LEAP_HAND* hand) const;
 
@@ -59,14 +93,20 @@ class UltraleapPoller
 		void handleTrackingMessage(const LEAP_TRACKING_EVENT *tracking_event);
 		
 		void pinchChecks(const LEAP_HAND* hand);
+		void indexPinchChecks(const LEAP_HAND* hand);
+		void middlePinchChecks(const LEAP_HAND* hand);
+		void ringPinchChecks(const LEAP_HAND* hand);
+		void pinkyPinchChecks(const LEAP_HAND* hand);
 		void fistChecks(const LEAP_HAND* hand);
 		void VChecks(const LEAP_HAND* hand);
 
 	private:
 		bool pollerRunning_ = false;
 		const float pinchThreshold_ =  0.85f;
-		const float middlePinchThreshold_ =  15.f;
-		const float ringPinchThreshold_ =  15.f;
+		const float indexPinchThreshold_  =  25.f;
+		const float middlePinchThreshold_ =  35.f;
+		const float ringPinchThreshold_   =  25.f;
+		const float pinkyPinchThreshold_  =  35.f;
 		const float fistThreshold_ =  0.9f;
 
 		position_callback_t positionCallback_;
@@ -74,6 +114,22 @@ class UltraleapPoller
 		gesture_callback_t pinchStartCallback_;
 		gesture_callback_t pinchContinueCallback_;
 		gesture_callback_t pinchStopCallback_;
+
+		gesture_callback_t indexPinchStartCallback_;
+		gesture_callback_t indexPinchContinueCallback_;
+		gesture_callback_t indexPinchStopCallback_;
+
+		gesture_callback_t middlePinchStartCallback_;
+		gesture_callback_t middlePinchContinueCallback_;
+		gesture_callback_t middlePinchStopCallback_;
+
+		gesture_callback_t ringPinchStartCallback_;
+		gesture_callback_t ringPinchContinueCallback_;
+		gesture_callback_t ringPinchStopCallback_;
+
+		gesture_callback_t pinkyPinchStartCallback_;
+		gesture_callback_t pinkyPinchContinueCallback_;
+		gesture_callback_t pinkyPinchStopCallback_;
 
 		gesture_callback_t fistStartCallback_;
 		gesture_callback_t fistContinueCallback_;
@@ -89,6 +145,10 @@ class UltraleapPoller
 		uint32_t activeHandID = 0;
 
 		bool doingPinch_ = false;
+		bool doingIndexPinch_ = false;
+		bool doingMiddlePinch_ = false;
+		bool doingRingPinch_ = false;
+		bool doingPinkyPinch_ = false;
 		bool doingFist_ = false;
 		bool doingV_ = false;
 };

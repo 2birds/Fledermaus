@@ -49,36 +49,48 @@ int main()
 
   return 0;
   */
+	float mouseSpeed = 1.8f;
+	bool vertical = false;
+
+	printf("Setting up..");
 	UltraleapPoller ulp;
-	ulp.SetOnFistStartCallback([](eLeapHandType) { 
+	ulp.SetOnPinkyPinchStartCallback([](eLeapHandType) { 
 			printf("Fist start\n");
 		SetMouseActive(false); });
-	ulp.SetOnFistStopCallback([](eLeapHandType) {
+	ulp.SetOnPinkyPinchStopCallback([](eLeapHandType) {
 		printf("Fist stopped\n");
 		SetMouseActive(true); });
-	ulp.SetOnPinchStartCallback([](eLeapHandType) { 
+	ulp.SetOnIndexPinchStartCallback([](eLeapHandType) { 
 		printf("Pinch started\n");
 		PrimaryDown(); });
-	ulp.SetOnPinchStopCallback([](eLeapHandType) {
+	ulp.SetOnIndexPinchStopCallback([](eLeapHandType) {
 		printf("Pinch stopped\n");
 		PrimaryUp(); });
-	ulp.SetOnVStartCallback([](eLeapHandType) {
+	ulp.SetOnMiddlePinchStartCallback([](eLeapHandType) {
 			printf("V started\n");
 		SecondaryClick();
     });
 
-	ulp.SetPositionCallback([](LEAP_VECTOR v){ 
+	ulp.SetPositionCallback([mouseSpeed, vertical](LEAP_VECTOR v){ 
 		if ((PrevPos.x == 0 && PrevPos.y == 0 && PrevPos.z == 0) || !MouseActive)
 		{
 		    // We want to do relative updates so skip this one so we have sensible numbers
 		}
-		else
-		{
-			int xMove = static_cast<int>(v.x - PrevPos.x);
-			int yMove = -static_cast<int>(v.y - PrevPos.y);
-			MoveMouse(xMove, yMove);
-		}
-		PrevPos = v;	
+        else
+        {
+            int xMove, yMove;
+            xMove = static_cast<int>(mouseSpeed * (v.x - PrevPos.x));
+            if (vertical)
+            {
+                yMove = -static_cast<int>(mouseSpeed * (v.y - PrevPos.y));
+            }
+            else
+            {
+                yMove = static_cast<int>(mouseSpeed * (v.z - PrevPos.z));
+            }
+                MoveMouse(xMove, yMove);
+            }
+            PrevPos = v;    
 	});
 	
 	ulp.StartPoller();

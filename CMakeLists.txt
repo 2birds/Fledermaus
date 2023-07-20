@@ -37,3 +37,9 @@ target_link_libraries(${PROJECT_NAME}
      PRIVATE
      mouse_control
      ultraleap_poller)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+	"${ULTRALEAP_PATH_ROOT}/LeapSDK/lib/x64/LeapC.dll"
+	${CMAKE_BINARY_DIR})
+
