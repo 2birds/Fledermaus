@@ -13,7 +13,7 @@ void SetMouseActive(bool active)
 	MouseActive = active;
 }
 
-int main()
+int main(int argc, char** argv)
 {
 	/*
 	std::cout << "Moving mouse" << std::endl;
@@ -50,14 +50,46 @@ int main()
   return 0;
   */
 	float mouseSpeed = 1.8f;
-	bool vertical = false;
+	bool vertical = true;
+
+	for (int i = 0; i < argc; i++)
+	{
+			if (strcmp(argv[i], "speed") == 0)
+			{
+					if (i < (argc - 1))
+					{
+						try {
+								mouseSpeed = static_cast<float>(std::atof(argv[i + 1]));
+						}
+						catch (std::exception &e)
+						{
+								std::cout << "Could not set mouse speed, number must be a float" << std::endl;
+								std::cout << "Error: " << e.what() << std::endl;
+								return -1;
+						}
+					}
+					else
+					{
+								std::cout << "Not enough arguments" << std::endl;
+								return -1;
+					}
+			}
+			else if (strcmp(argv[i], "vertical") == 0)
+			{
+                vertical = true;
+			}
+			else if (strcmp(argv[i], "horizontal") == 0)
+			{
+                vertical = false;
+			}
+	}
 
 	printf("Setting up..");
 	UltraleapPoller ulp;
-	ulp.SetOnPinkyPinchStartCallback([](eLeapHandType) { 
+	ulp.SetOnFistStartCallback([](eLeapHandType) { 
 			printf("Fist start\n");
 		SetMouseActive(false); });
-	ulp.SetOnPinkyPinchStopCallback([](eLeapHandType) {
+	ulp.SetOnFistStopCallback([](eLeapHandType) {
 		printf("Fist stopped\n");
 		SetMouseActive(true); });
 	ulp.SetOnIndexPinchStartCallback([](eLeapHandType) { 
