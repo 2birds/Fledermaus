@@ -74,8 +74,8 @@ int main()
 		}
 		else
 		{
-			int xMove = static_cast<int>(v.x - PrevPos.x);
-			int yMove = -static_cast<int>(v.y - PrevPos.y);
+			int xMove = static_cast<int>(1.8f * (v.x - PrevPos.x));
+			int yMove = -static_cast<int>(1.8f * (v.y - PrevPos.y));
 			MoveMouse(xMove, yMove);
 		}
 		PrevPos = v;	

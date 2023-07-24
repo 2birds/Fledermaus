@@ -3,14 +3,20 @@
 
 bool MoveMouse(int x, int y)
 {
-	INPUT input;
-	input.type = INPUT_MOUSE;
-	input.mi.mouseData = 0;
-	input.mi.dx = x;
-	input.mi.dy = y;
-	input.mi.dwFlags = MOUSEEVENTF_MOVE;
-	SendInput(1, &input, sizeof(input));
-	return true;
+// 	INPUT input;
+// 	input.type = INPUT_MOUSE;
+// 	input.mi.mouseData = 0;
+// 	input.mi.dx = x;
+// 	input.mi.dy = y;
+// 	input.mi.dwFlags = MOUSEEVENTF_MOVE;
+// 	SendInput(1, &input, sizeof(input));
+    POINT p;
+	if (GetCursorPos(&p))
+	{
+		SetCursorPos(p.x + x, p.y + y);
+		return true;
+	}
+	return false;
 }
 
 bool IssueClick(DWORD flags)
