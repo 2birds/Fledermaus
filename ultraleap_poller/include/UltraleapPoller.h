@@ -47,6 +47,10 @@ class UltraleapPoller
 		void SetOnVContinueCallback(gesture_callback_t callback);
 		void SetOnVStopCallback(gesture_callback_t callback);
 
+		void SetOnRotateStartCallback(gesture_callback_t callback);
+		void SetOnRotateContinueCallback(gesture_callback_t callback);
+		void SetOnRotateStopCallback(gesture_callback_t callback);
+
 		void ClearPositionCallback();
 
 		void ClearOnPinchStartCallback();
@@ -77,6 +81,10 @@ class UltraleapPoller
 		void ClearOnVContinueCallback();
 		void ClearOnVStopCallback();
 
+		void ClearOnRotateStartCallback();
+		void ClearOnRotateContinueCallback();
+		void ClearOnRotateStopCallback();
+
 	private:
         void runPoller();
 		float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
@@ -88,6 +96,7 @@ class UltraleapPoller
 		bool isPinkyPinching(const LEAP_HAND *hand) const;
 		bool isFist(const LEAP_HAND *hand) const;
 		bool isV(const LEAP_HAND* hand) const;
+		bool isRotated(const LEAP_HAND* hand) const;
 
 		void handleDeviceMessage(const LEAP_DEVICE_EVENT *device_event);
 		void handleTrackingMessage(const LEAP_TRACKING_EVENT *tracking_event);
@@ -99,6 +108,7 @@ class UltraleapPoller
 		void pinkyPinchChecks(const LEAP_HAND* hand);
 		void fistChecks(const LEAP_HAND* hand);
 		void VChecks(const LEAP_HAND* hand);
+		void rotateChecks(const LEAP_HAND* hand);
 
 	private:
 		bool pollerRunning_ = false;
@@ -108,6 +118,7 @@ class UltraleapPoller
 		const float ringPinchThreshold_   =  25.f;
 		const float pinkyPinchThreshold_  =  35.f;
 		const float fistThreshold_ =  0.9f;
+		const float rotationThreshold_ = 20.f;
 
 		position_callback_t positionCallback_;
 
@@ -139,6 +150,10 @@ class UltraleapPoller
 		gesture_callback_t VContinueCallback_;
 		gesture_callback_t VStopCallback_;
 
+		gesture_callback_t rotateStartCallback_;
+		gesture_callback_t rotateContinueCallback_;
+		gesture_callback_t rotateStopCallback_;
+
 		LEAP_CONNECTION lc_;
 		std::thread pollingThread_;
 		
@@ -151,4 +166,5 @@ class UltraleapPoller
 		bool doingPinkyPinch_ = false;
 		bool doingFist_ = false;
 		bool doingV_ = false;
+		bool doingRotate_ = false;
 };

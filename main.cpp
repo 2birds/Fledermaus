@@ -98,9 +98,13 @@ int main(int argc, char** argv)
 	ulp.SetOnIndexPinchStopCallback([](eLeapHandType) {
 		printf("Pinch stopped\n");
 		PrimaryUp(); });
-	ulp.SetOnMiddlePinchStartCallback([](eLeapHandType) {
-			printf("V started\n");
-		SecondaryClick();
+	ulp.SetOnRotateStartCallback([](eLeapHandType) {
+			printf("Rotate started\n");
+		SecondaryDown();
+    });
+	ulp.SetOnRotateStopCallback([](eLeapHandType) {
+			printf("Rotate stopped\n");
+		SecondaryUp();
     });
 
 	ulp.SetPositionCallback([mouseSpeed, vertical](LEAP_VECTOR v){ 

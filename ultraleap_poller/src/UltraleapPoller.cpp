@@ -366,6 +366,39 @@ void UltraleapPoller::VChecks(const LEAP_HAND* hand)
   }
 }
 
+void UltraleapPoller::rotateChecks(const LEAP_HAND* hand)
+{
+  if (isRotated(hand))
+  {
+		if (doingRotate_)
+		{
+			if (rotateContinueCallback_)
+			{
+				rotateContinueCallback_(hand->type);
+			}
+		}
+		else
+		{
+			if (rotateStartCallback_)
+			{
+				rotateStartCallback_(hand->type);
+			}
+			doingRotate_ = true;
+		}
+  }
+  else
+  {
+		if (doingRotate_)
+		{
+			if (rotateStopCallback_)
+			{
+				rotateStopCallback_(hand->type);
+			}
+			doingRotate_ = false;
+		}
+  }
+}
+
 void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_event)
 {
   if (tracking_event->nHands)
@@ -394,6 +427,7 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 					pinkyPinchChecks(&hand);
 					fistChecks(&hand);
 					VChecks(&hand);
+					rotateChecks(&hand);
 				}
 			}
 			else
@@ -530,6 +564,19 @@ void UltraleapPoller::SetOnVStopCallback(gesture_callback_t callback)
 	VStopCallback_ = callback;
 }
 
+void UltraleapPoller::SetOnRotateStartCallback(gesture_callback_t callback)
+{
+	rotateStartCallback_ = callback;
+}
+void UltraleapPoller::SetOnRotateContinueCallback(gesture_callback_t callback)
+{
+	rotateContinueCallback_ = callback;
+}
+void UltraleapPoller::SetOnRotateStopCallback(gesture_callback_t callback)
+{
+	rotateStopCallback_ = callback;
+}
+
 void UltraleapPoller::ClearPositionCallback()
 {
 	positionCallback_ = nullptr;
@@ -626,6 +673,19 @@ void UltraleapPoller::ClearOnVStopCallback()
 	VStopCallback_ = nullptr;
 }
 
+void UltraleapPoller::ClearOnRotateStartCallback()
+{
+	rotateStartCallback_ = nullptr;
+}
+void UltraleapPoller::ClearOnRotateContinueCallback()
+{
+	rotateContinueCallback_ = nullptr;
+}
+void UltraleapPoller::ClearOnRotateStopCallback()
+{
+	rotateStopCallback_ = nullptr;
+}
+
 float UltraleapPoller::distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const
 {
 	return static_cast<float>(std::sqrt(std::pow(second.x - first.x, 2) +
@@ -682,5 +742,11 @@ bool UltraleapPoller::isV(const LEAP_HAND* hand) const
             distance(hand->middle.distal.next_joint, hand->palm.position) > 80.f &&
             distance(hand->ring.distal.next_joint, hand->palm.position)   < 40.f &&
             distance(hand->pinky.distal.next_joint, hand->palm.position)  < 40.f;
+}
+
+bool UltraleapPoller::isRotated(const LEAP_HAND* hand) const
+{
+     return std::sqrt(std::pow(hand->index.proximal.prev_joint.x - hand->pinky.proximal.prev_joint.x, 2) +
+                      std::pow(hand->index.proximal.prev_joint.z - hand->pinky.proximal.prev_joint.z, 2)) < rotationThreshold_;
 }
 
