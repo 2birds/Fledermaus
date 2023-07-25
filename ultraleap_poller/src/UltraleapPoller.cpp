@@ -151,8 +151,8 @@ void UltraleapPoller::pinchChecks(const LEAP_HAND* hand)
 			if (pinchStartCallback_)
 			{
 				pinchStartCallback_(hand->type);
-				doingPinch_ = true;
 			}
+			doingPinch_ = true;
 		}
   }
   else
@@ -184,8 +184,8 @@ void UltraleapPoller::indexPinchChecks(const LEAP_HAND* hand)
 			if (indexPinchStartCallback_)
 			{
 				indexPinchStartCallback_(hand->type);
-				doingIndexPinch_ = true;
 			}
+			doingIndexPinch_ = true;
 		}
   }
   else
@@ -217,8 +217,8 @@ void UltraleapPoller::middlePinchChecks(const LEAP_HAND* hand)
 			if (middlePinchStartCallback_)
 			{
 				middlePinchStartCallback_(hand->type);
-				doingMiddlePinch_ = true;
 			}
+			doingMiddlePinch_ = true;
 		}
   }
   else
@@ -250,8 +250,8 @@ void UltraleapPoller::ringPinchChecks(const LEAP_HAND* hand)
 			if (ringPinchStartCallback_)
 			{
 				ringPinchStartCallback_(hand->type);
-				doingRingPinch_ = true;
 			}
+			doingRingPinch_ = true;
 		}
   }
   else
@@ -283,8 +283,8 @@ void UltraleapPoller::pinkyPinchChecks(const LEAP_HAND* hand)
 			if (pinkyPinchStartCallback_)
 			{
 				pinkyPinchStartCallback_(hand->type);
-				doingPinkyPinch_ = true;
 			}
+			doingPinkyPinch_ = true;
 		}
   }
   else
@@ -316,8 +316,8 @@ void UltraleapPoller::fistChecks(const LEAP_HAND* hand)
 			if (fistStartCallback_)
 			{
 				fistStartCallback_(hand->type);
-				doingFist_ = true;
 			}
+			doingFist_ = true;
 		}
   }
   else
@@ -349,8 +349,8 @@ void UltraleapPoller::VChecks(const LEAP_HAND* hand)
 			if (VStartCallback_)
 			{
 				VStartCallback_(hand->type);
-				doingV_ = true;
 			}
+			doingV_ = true;
 		}
   }
   else
