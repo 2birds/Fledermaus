@@ -113,7 +113,7 @@ class UltraleapPoller
 	private:
 		bool pollerRunning_ = false;
 		const float pinchThreshold_ =  0.85f;
-		const float indexPinchThreshold_  =  25.f;
+		const float indexPinchThreshold_  =  35.f;
 		const float middlePinchThreshold_ =  35.f;
 		const float ringPinchThreshold_   =  25.f;
 		const float pinkyPinchThreshold_  =  35.f;
