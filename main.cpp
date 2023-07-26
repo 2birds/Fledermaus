@@ -6,11 +6,18 @@
 #include "UltraleapPoller.h"
 
 bool MouseActive = true;
+bool Scrolling = false;
+
 LEAP_VECTOR PrevPos = {0, 0, 0};
 
 void SetMouseActive(bool active)
 {
 	MouseActive = active;
+}
+
+void SetScrolling(bool scrolling)
+{
+	Scrolling = scrolling;
 }
 
 int main(int argc, char** argv)
@@ -50,6 +57,7 @@ int main(int argc, char** argv)
   return 0;
   */
 	float mouseSpeed = 1.8f;
+	float scrollingSpeed = 1.f;
 	bool vertical = true;
 
 	for (int i = 0; i < argc; i++)
@@ -87,46 +95,53 @@ int main(int argc, char** argv)
 	printf("Setting up..");
 	UltraleapPoller ulp;
 	ulp.SetOnFistStartCallback([](eLeapHandType) { 
-			printf("Fist start\n");
+			// printf("Fist start\n");
 		SetMouseActive(false); });
 	ulp.SetOnFistStopCallback([](eLeapHandType) {
-		printf("Fist stopped\n");
+		// printf("Fist stopped\n");
 		SetMouseActive(true); });
 	ulp.SetOnIndexPinchStartCallback([](eLeapHandType) { 
-		printf("Pinch started\n");
+		// printf("Pinch started\n");
 		PrimaryDown(); });
 	ulp.SetOnIndexPinchStopCallback([](eLeapHandType) {
-		printf("Pinch stopped\n");
+		// printf("Pinch stopped\n");
 		PrimaryUp(); });
 	ulp.SetOnRotateStartCallback([](eLeapHandType) {
-			printf("Rotate started\n");
+			// printf("Rotate started\n");
 		SecondaryDown();
     });
 	ulp.SetOnRotateStopCallback([](eLeapHandType) {
-			printf("Rotate stopped\n");
+			// printf("Rotate stopped\n");
 		SecondaryUp();
     });
+	ulp.SetOnVStartCallback([](eLeapHandType) {
+		SetScrolling(true);
+    });
+	ulp.SetOnVStopCallback([](eLeapHandType) {
+		SetScrolling(false);
+    });
 
-	ulp.SetPositionCallback([mouseSpeed, vertical](LEAP_VECTOR v){ 
+	ulp.SetPositionCallback([mouseSpeed, scrollingSpeed, vertical](LEAP_VECTOR v){ 
 		if ((PrevPos.x == 0 && PrevPos.y == 0 && PrevPos.z == 0) || !MouseActive)
 		{
 		    // We want to do relative updates so skip this one so we have sensible numbers
 		}
         else
         {
-            int xMove, yMove;
-            xMove = static_cast<int>(mouseSpeed * (v.x - PrevPos.x));
-            if (vertical)
-            {
-                yMove = -static_cast<int>(mouseSpeed * (v.y - PrevPos.y));
-            }
-            else
-            {
-                yMove = static_cast<int>(mouseSpeed * (v.z - PrevPos.z));
-            }
-                MoveMouse(xMove, yMove);
-            }
-            PrevPos = v;    
+
+			int xMove = static_cast<int>(mouseSpeed * (v.x - PrevPos.x));
+			float yMove = (v.y - PrevPos.y) * (vertical ? -1 : 1);
+
+		    if (Scrolling)
+			{
+		            VerticalScroll(static_cast<int>(scrollingSpeed * yMove));	     
+			}
+			else
+			{
+					MoveMouse(xMove, static_cast<int>(mouseSpeed * yMove));
+			}
+		}
+		PrevPos = v;    
 	});
 	
 	ulp.StartPoller();
