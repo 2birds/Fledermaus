@@ -57,7 +57,7 @@ int main(int argc, char** argv)
   return 0;
   */
 	float mouseSpeed = 1.8f;
-	float scrollingSpeed = 1.f;
+	float scrollingSpeed = 3.;
 	bool vertical = true;
 
 	for (int i = 0; i < argc; i++)
@@ -72,6 +72,26 @@ int main(int argc, char** argv)
 						catch (std::exception &e)
 						{
 								std::cout << "Could not set mouse speed, number must be a float" << std::endl;
+								std::cout << "Error: " << e.what() << std::endl;
+								return -1;
+						}
+					}
+					else
+					{
+								std::cout << "Not enough arguments" << std::endl;
+								return -1;
+					}
+			}
+			else if (strcmp(argv[i], "scrolling") == 0)
+			{
+					if (i < (argc - 1))
+					{
+						try {
+								scrollingSpeed = static_cast<float>(std::atof(argv[i + 1]));
+						}
+						catch (std::exception &e)
+						{
+								std::cout << "Could not set scrolling speed, number must be a float" << std::endl;
 								std::cout << "Error: " << e.what() << std::endl;
 								return -1;
 						}
