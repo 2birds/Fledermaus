@@ -738,8 +738,8 @@ bool UltraleapPoller::isFist(const LEAP_HAND* hand) const
 
 bool UltraleapPoller::isV(const LEAP_HAND* hand) const
 {
-     return distance(hand->index.distal.next_joint, hand->palm.position)  > 80.f &&
-            distance(hand->middle.distal.next_joint, hand->palm.position) > 80.f &&
+     return distance(hand->index.distal.next_joint, hand->palm.position)  > 70.f &&
+            distance(hand->middle.distal.next_joint, hand->palm.position) > 70.f &&
             distance(hand->ring.distal.next_joint, hand->palm.position)   < 40.f &&
             distance(hand->pinky.distal.next_joint, hand->palm.position)  < 40.f;
 }
