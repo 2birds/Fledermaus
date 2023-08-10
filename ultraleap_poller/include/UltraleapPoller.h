@@ -2,11 +2,26 @@
 
 #include <algorithm>
 #include <functional>
+#include <map>
 #include <mutex>
 #include <thread>
 
 typedef std::function<void(LEAP_VECTOR)> position_callback_t;
 typedef std::function<void(eLeapHandType)> gesture_callback_t;
+typedef std::function<bool(const LEAP_HAND*)> gesture_predicate_t;
+typedef std::map<UltraleapPollerGestures, gesture_callback_t> state_callbacks_t
+
+enum UltraleapPollerGestures {
+	PINCH,
+	INDEXPINCH,
+	MIDDLEPINCH,
+	RINGPINCH,
+	PINKYPINCH,
+	FIST,
+	V,
+	ROTATE
+};
+
 class UltraleapPoller
 {
 	public:
@@ -86,17 +101,18 @@ class UltraleapPoller
 		void ClearOnRotateStopCallback();
 
 	private:
-        void runPoller();
+		void doChecks(const UltraleapPollerGestures gesture, const LEAP_HAND* hand);
+		void runPoller();
 		float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
 
-		bool isPinching(const LEAP_HAND* hand) const;
-		bool isIndexPinching(const LEAP_HAND* hand) const;
-		bool isMiddlePinching(const LEAP_HAND *hand) const;
-		bool isRingPinching(const LEAP_HAND *hand) const;
-		bool isPinkyPinching(const LEAP_HAND *hand) const;
-		bool isFist(const LEAP_HAND *hand) const;
-		bool isV(const LEAP_HAND* hand) const;
-		bool isRotated(const LEAP_HAND* hand) const;
+		static bool isPinching(const LEAP_HAND* hand) const;
+		static bool isIndexPinching(const LEAP_HAND* hand) const;
+		static bool isMiddlePinching(const LEAP_HAND *hand) const;
+		static bool isRingPinching(const LEAP_HAND *hand) const;
+		static bool isPinkyPinching(const LEAP_HAND *hand) const;
+		static bool isFist(const LEAP_HAND *hand) const;
+		static bool isV(const LEAP_HAND* hand) const;
+		static bool isRotated(const LEAP_HAND* hand) const;
 
 		void handleDeviceMessage(const LEAP_DEVICE_EVENT *device_event);
 		void handleTrackingMessage(const LEAP_TRACKING_EVENT *tracking_event);
@@ -122,6 +138,7 @@ class UltraleapPoller
 
 		position_callback_t positionCallback_;
 
+		/*
 		gesture_callback_t pinchStartCallback_;
 		gesture_callback_t pinchContinueCallback_;
 		gesture_callback_t pinchStopCallback_;
@@ -153,6 +170,13 @@ class UltraleapPoller
 		gesture_callback_t rotateStartCallback_;
 		gesture_callback_t rotateContinueCallback_;
 		gesture_callback_t rotateStopCallback_;
+		*/
+
+		std::map<UltraleapPollerGestures, gesture_predicate_t> gesturePredicates_;
+		std::map<UltraleapPollerGestures, bool> gestureStates_;
+		state_callbacks_t gestureStartCallbacks_;
+		state_callbacks_t gestureContinueCallbacks_;
+		state_callbacks_t gestureStopCallbacks_;
 
 		LEAP_CONNECTION lc_;
 		std::thread pollingThread_;
