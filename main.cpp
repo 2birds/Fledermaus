@@ -2,6 +2,7 @@
 #include <iostream>
 #include <thread>
 
+#include "ConfigReader.h"
 #include "MouseControl.h"
 #include "UltraleapPoller.h"
 
@@ -17,11 +18,18 @@ void SetMouseActive(bool active)
 
 void SetScrolling(bool scrolling)
 {
+	std::cout << "Setting scrolling to " << (Scrolling ? "true" : "false") << std::endl;
 	Scrolling = scrolling;
+}
+
+bool GetScrolling()
+{
+	return Scrolling;
 }
 
 int main(int argc, char** argv)
 {
+	ConfigReader config;
 	/*
 	std::cout << "Moving mouse" << std::endl;
 
@@ -56,9 +64,11 @@ int main(int argc, char** argv)
 
   return 0;
   */
-	float mouseSpeed = 1.8f;
-	float scrollingSpeed = 3.;
-	bool vertical = true;
+
+
+	// float mouseSpeed = 1.8f;
+	// float scrollingSpeed = 3.;
+	// bool vertical = true;
 
 	for (int i = 0; i < argc; i++)
 	{
@@ -67,7 +77,7 @@ int main(int argc, char** argv)
 					if (i < (argc - 1))
 					{
 						try {
-								mouseSpeed = static_cast<float>(std::atof(argv[i + 1]));
+								config.SetSpeed(static_cast<float>(std::atof(argv[i + 1])));
 						}
 						catch (std::exception &e)
 						{
@@ -87,7 +97,7 @@ int main(int argc, char** argv)
 					if (i < (argc - 1))
 					{
 						try {
-								scrollingSpeed = static_cast<float>(std::atof(argv[i + 1]));
+								config.SetScrollingSpeed(static_cast<float>(std::atof(argv[i + 1])));
 						}
 						catch (std::exception &e)
 						{
@@ -104,11 +114,11 @@ int main(int argc, char** argv)
 			}
 			else if (strcmp(argv[i], "vertical") == 0)
 			{
-                vertical = true;
+                config.SetVerticalOrientation(true);
 			}
 			else if (strcmp(argv[i], "horizontal") == 0)
 			{
-                vertical = false;
+                config.SetVerticalOrientation(false);
 			}
 	}
 
@@ -141,7 +151,7 @@ int main(int argc, char** argv)
 		SetScrolling(false);
     });
 
-	ulp.SetPositionCallback([mouseSpeed, scrollingSpeed, vertical](LEAP_VECTOR v){ 
+	ulp.SetPositionCallback([&config](LEAP_VECTOR v){ 
 		if ((PrevPos.x == 0 && PrevPos.y == 0 && PrevPos.z == 0) || !MouseActive)
 		{
 		    // We want to do relative updates so skip this one so we have sensible numbers
@@ -149,22 +159,24 @@ int main(int argc, char** argv)
         else
         {
 
-			int xMove = static_cast<int>(mouseSpeed * (v.x - PrevPos.x));
-			float yMove = (v.y - PrevPos.y) * (vertical ? -1 : 1);
+			int xMove = static_cast<int>(config.GetSpeed() * (v.x - PrevPos.x));
+			float yMove = (v.y - PrevPos.y) * (config.IsVerticalOrientation() ? -1 : 1);
 
-		    if (Scrolling)
+		    if (config.GetUseScrolling() && Scrolling)
 			{
-		            VerticalScroll(static_cast<int>(scrollingSpeed * yMove));	     
+		            VerticalScroll(static_cast<int>(config.GetScrollingSpeed() * yMove));	     
 			}
 			else
 			{
-					MoveMouse(xMove, static_cast<int>(mouseSpeed * yMove));
+					MoveMouse(xMove, static_cast<int>(config.GetSpeed()* yMove));
 			}
 		}
 		PrevPos = v;    
 	});
 	
 	ulp.StartPoller();
+	
+	std::cout << "Press \"x\" to quit." << std::endl;
 	
 	while (true)
 	{

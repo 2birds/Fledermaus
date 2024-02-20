@@ -31,6 +31,10 @@ set(Fledermaus_SRCS
 add_executable(${PROJECT_NAME}
 	             ${Fledermaus_SRCS})
 
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE
+                           "rapidjson/include")
+
 target_link_libraries(${PROJECT_NAME}
      PUBLIC
      LeapSDK::LeapC
