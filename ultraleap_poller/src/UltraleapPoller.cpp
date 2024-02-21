@@ -204,7 +204,7 @@ void UltraleapPoller::runPoller()
 				handleTrackingMessage(msg.tracking_event);
 				break;
 			default:
-			    printf("No intention of supporting this\n");
+			    printf("Received unsupported message\n");
 				break;
 		}
 	}
