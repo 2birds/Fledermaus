@@ -6,7 +6,7 @@
 #include <thread>
 
 typedef std::function<void(LEAP_VECTOR)> position_callback_t;
-typedef std::function<void(eLeapHandType)> gesture_callback_t;
+typedef std::function<void(const LEAP_HAND&)> gesture_callback_t;
 class UltraleapPoller
 {
 	public:
@@ -88,6 +88,9 @@ class UltraleapPoller
 	private:
         void runPoller();
 		float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
+        LEAP_VECTOR difference(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
+		float dot(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
+       float magnitude(const LEAP_VECTOR vec) const;
 
 		bool isPinching(const LEAP_HAND* hand) const;
 		bool isIndexPinching(const LEAP_HAND* hand) const;
@@ -96,6 +99,7 @@ class UltraleapPoller
 		bool isPinkyPinching(const LEAP_HAND *hand) const;
 		bool isFist(const LEAP_HAND *hand) const;
 		bool isV(const LEAP_HAND* hand) const;
+        bool isV2(const LEAP_HAND* hand) const;
 		bool isRotated(const LEAP_HAND* hand) const;
 
 		void handleDeviceMessage(const LEAP_DEVICE_EVENT *device_event);

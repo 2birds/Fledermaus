@@ -8,6 +8,7 @@
 #define CONFIG_FILE_NAME "fledermaus_config.json"
 
 #define SPEED_NAME "Speed"
+#define LOCK_MOUSE_ON_SCROLL_NAME "LockMouseOnScroll"
 #define SCROLLING_ON_NAME "ScrollingActive"
 #define SCROLLING_SPEED_NAME "ScrollingSpeed"
 #define ORIENTATION_NAME "Orientation"
@@ -24,6 +25,7 @@ class ConfigReader {
     bool use_scrolling_ = true;
     float scrolling_speed_ = 2.0f;
     bool vertical_orientation_ = true;
+    bool lockMouseOnScroll_ = true;
 
     public:
     ConfigReader(std::string config_file_name) :
@@ -56,6 +58,11 @@ class ConfigReader {
         speed_ = speed;
     }
 
+    void SetLockMouseOnScroll(const bool lockMouseOnScroll)
+    {
+        lockMouseOnScroll_ = lockMouseOnScroll;
+    }
+
     void SetUseScrolling(const bool use_scrolling)
     {
         use_scrolling_ = use_scrolling;
@@ -79,6 +86,11 @@ class ConfigReader {
     float GetSpeed() const
     {
         return speed_;
+    }
+
+    bool GetLockMouseOnScroll()
+    {
+        return lockMouseOnScroll_;
     }
 
     bool GetUseScrolling() const
@@ -126,6 +138,12 @@ class ConfigReader {
         {
             assert(d_[SPEED_NAME].IsNumber());
             speed_ = d_[SPEED_NAME].GetFloat();
+        }
+
+        if (d_.HasMember(LOCK_MOUSE_ON_SCROLL_NAME))
+        {
+            assert(d_[LOCK_MOUSE_ON_SCROLL_NAME].IsBool());
+            use_scrolling_= d_[LOCK_MOUSE_ON_SCROLL_NAME].GetBool();
         }
 
         if (d_.HasMember(SCROLLING_ON_NAME))

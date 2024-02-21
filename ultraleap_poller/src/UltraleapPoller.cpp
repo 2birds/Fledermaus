@@ -143,14 +143,14 @@ void UltraleapPoller::pinchChecks(const LEAP_HAND* hand)
 		{
 			if (pinchContinueCallback_)
 			{
-				pinchContinueCallback_(hand->type);
+				pinchContinueCallback_(*hand);
 			}
 		}
 		else
 		{
 			if (pinchStartCallback_)
 			{
-				pinchStartCallback_(hand->type);
+				pinchStartCallback_(*hand);
 			}
 			doingPinch_ = true;
 		}
@@ -161,7 +161,7 @@ void UltraleapPoller::pinchChecks(const LEAP_HAND* hand)
 		{
 			if (pinchStopCallback_)
 			{
-				pinchStopCallback_(hand->type);
+				pinchStopCallback_(*hand);
 			}
 			doingPinch_ = false;
 		}
@@ -176,14 +176,14 @@ void UltraleapPoller::indexPinchChecks(const LEAP_HAND* hand)
 		{
 			if (indexPinchContinueCallback_)
 			{
-				indexPinchContinueCallback_(hand->type);
+				indexPinchContinueCallback_(*hand);
 			}
 		}
 		else
 		{
 			if (indexPinchStartCallback_)
 			{
-				indexPinchStartCallback_(hand->type);
+				indexPinchStartCallback_(*hand);
 			}
 			doingIndexPinch_ = true;
 		}
@@ -194,7 +194,7 @@ void UltraleapPoller::indexPinchChecks(const LEAP_HAND* hand)
 		{
 			if (indexPinchStopCallback_)
 			{
-				indexPinchStopCallback_(hand->type);
+				indexPinchStopCallback_(*hand);
 			}
 			doingIndexPinch_ = false;
 		}
@@ -209,14 +209,14 @@ void UltraleapPoller::middlePinchChecks(const LEAP_HAND* hand)
 		{
 			if (middlePinchContinueCallback_)
 			{
-				middlePinchContinueCallback_(hand->type);
+				middlePinchContinueCallback_(*hand);
 			}
 		}
 		else
 		{
 			if (middlePinchStartCallback_)
 			{
-				middlePinchStartCallback_(hand->type);
+				middlePinchStartCallback_(*hand);
 			}
 			doingMiddlePinch_ = true;
 		}
@@ -227,7 +227,7 @@ void UltraleapPoller::middlePinchChecks(const LEAP_HAND* hand)
 		{
 			if (middlePinchStopCallback_)
 			{
-				middlePinchStopCallback_(hand->type);
+				middlePinchStopCallback_(*hand);
 			}
 			doingMiddlePinch_ = false;
 		}
@@ -242,14 +242,14 @@ void UltraleapPoller::ringPinchChecks(const LEAP_HAND* hand)
 		{
 			if (ringPinchContinueCallback_)
 			{
-				ringPinchContinueCallback_(hand->type);
+				ringPinchContinueCallback_(*hand);
 			}
 		}
 		else
 		{
 			if (ringPinchStartCallback_)
 			{
-				ringPinchStartCallback_(hand->type);
+				ringPinchStartCallback_(*hand);
 			}
 			doingRingPinch_ = true;
 		}
@@ -260,7 +260,7 @@ void UltraleapPoller::ringPinchChecks(const LEAP_HAND* hand)
 		{
 			if (ringPinchStopCallback_)
 			{
-				ringPinchStopCallback_(hand->type);
+				ringPinchStopCallback_(*hand);
 			}
 			doingRingPinch_ = false;
 		}
@@ -275,14 +275,14 @@ void UltraleapPoller::pinkyPinchChecks(const LEAP_HAND* hand)
 		{
 			if (pinkyPinchContinueCallback_)
 			{
-				pinkyPinchContinueCallback_(hand->type);
+				pinkyPinchContinueCallback_(*hand);
 			}
 		}
 		else
 		{
 			if (pinkyPinchStartCallback_)
 			{
-				pinkyPinchStartCallback_(hand->type);
+				pinkyPinchStartCallback_(*hand);
 			}
 			doingPinkyPinch_ = true;
 		}
@@ -293,7 +293,7 @@ void UltraleapPoller::pinkyPinchChecks(const LEAP_HAND* hand)
 		{
 			if (pinkyPinchStopCallback_)
 			{
-				pinkyPinchStopCallback_(hand->type);
+				pinkyPinchStopCallback_(*hand);
 			}
 			doingPinkyPinch_ = false;
 		}
@@ -308,14 +308,14 @@ void UltraleapPoller::fistChecks(const LEAP_HAND* hand)
 		{
 			if (fistContinueCallback_)
 			{
-				fistContinueCallback_(hand->type);
+				fistContinueCallback_(*hand);
 			}
 		}
 		else
 		{
 			if (fistStartCallback_)
 			{
-				fistStartCallback_(hand->type);
+				fistStartCallback_(*hand);
 			}
 			doingFist_ = true;
 		}
@@ -326,7 +326,7 @@ void UltraleapPoller::fistChecks(const LEAP_HAND* hand)
 		{
 			if (fistStopCallback_)
 			{
-				fistStopCallback_(hand->type);
+				fistStopCallback_(*hand);
 			}
 			doingFist_ = false;
 		}
@@ -335,20 +335,21 @@ void UltraleapPoller::fistChecks(const LEAP_HAND* hand)
 
 void UltraleapPoller::VChecks(const LEAP_HAND* hand)
 {
-  if (isV(hand))
+  // if (isV(hand))
+  if (isV2(hand))
   {
 		if (doingV_)
 		{
 			if (VContinueCallback_)
 			{
-				VContinueCallback_(hand->type);
+				VContinueCallback_(*hand);
 			}
 		}
 		else
 		{
 			if (VStartCallback_)
 			{
-				VStartCallback_(hand->type);
+				VStartCallback_(*hand);
 			}
 			doingV_ = true;
 		}
@@ -359,7 +360,7 @@ void UltraleapPoller::VChecks(const LEAP_HAND* hand)
 		{
 			if (VStopCallback_)
 			{
-				VStopCallback_(hand->type);
+				VStopCallback_(*hand);
 			}
 			doingV_ = false;
 		}
@@ -374,14 +375,14 @@ void UltraleapPoller::rotateChecks(const LEAP_HAND* hand)
 		{
 			if (rotateContinueCallback_)
 			{
-				rotateContinueCallback_(hand->type);
+				rotateContinueCallback_(*hand);
 			}
 		}
 		else
 		{
 			if (rotateStartCallback_)
 			{
-				rotateStartCallback_(hand->type);
+				rotateStartCallback_(*hand);
 			}
 			doingRotate_ = true;
 		}
@@ -392,7 +393,7 @@ void UltraleapPoller::rotateChecks(const LEAP_HAND* hand)
 		{
 			if (rotateStopCallback_)
 			{
-				rotateStopCallback_(hand->type);
+				rotateStopCallback_(*hand);
 			}
 			doingRotate_ = false;
 		}
@@ -693,6 +694,30 @@ float UltraleapPoller::distance(const LEAP_VECTOR first, const LEAP_VECTOR secon
 										std::pow(second.z - first.z, 2)));
 }
 
+LEAP_VECTOR UltraleapPoller::difference(const LEAP_VECTOR first, const LEAP_VECTOR second) const
+{
+    LEAP_VECTOR ret;
+    ret.x = first.x - second.x;
+    ret.y = first.y - second.y;
+    ret.z = first.z - second.z;
+	return ret;
+}
+
+float UltraleapPoller::dot(const LEAP_VECTOR first, const LEAP_VECTOR second) const
+{
+	return (first.x * second.x) +
+	       (first.y * second.y) +
+	       (first.z * second.z);
+}
+
+float UltraleapPoller::magnitude(const LEAP_VECTOR vec) const
+{
+	return std::sqrt(
+		(vec.x * vec.x) +
+		(vec.y * vec.y) +
+		(vec.z * vec.z));
+}
+
 bool UltraleapPoller::isPinching(const LEAP_HAND* hand) const
 {
 	return hand->pinch_strength > pinchThreshold_;
@@ -738,10 +763,27 @@ bool UltraleapPoller::isFist(const LEAP_HAND* hand) const
 
 bool UltraleapPoller::isV(const LEAP_HAND* hand) const
 {
-     return distance(hand->index.distal.next_joint, hand->palm.position)  > 70.f &&
-            distance(hand->middle.distal.next_joint, hand->palm.position) > 70.f &&
+     return distance(hand->index.distal.next_joint, hand->palm.position)  > 65.f &&
+            distance(hand->middle.distal.next_joint, hand->palm.position) > 65.f &&
             distance(hand->ring.distal.next_joint, hand->palm.position)   < 40.f &&
             distance(hand->pinky.distal.next_joint, hand->palm.position)  < 40.f;
+}
+
+bool UltraleapPoller::isV2(const LEAP_HAND* hand) const
+{
+     LEAP_VECTOR index_vec  = difference(hand->index.distal.next_joint, hand->index.distal.prev_joint);
+     LEAP_VECTOR middle_vec = difference(hand->middle.distal.next_joint, hand->middle.distal.prev_joint);
+     // LEAP_VECTOR ring_vec   = difference(hand->ring.distal.next_joint, hand->ring.distal.prev_joint);
+     LEAP_VECTOR pinky_vec  = difference(hand->pinky.distal.next_joint, hand->pinky.distal.prev_joint);
+
+	 float index_middle_cos = dot(index_vec, middle_vec) / (magnitude(index_vec) * magnitude(middle_vec));
+	 // float ring_pinky_cos = dot(ring_vec, pinky_vec) / (magnitude(ring_vec) * magnitude(pinky_vec));
+	 float index_pinky_cos = dot(index_vec, pinky_vec) / (magnitude(index_vec) * magnitude(pinky_vec));
+
+     float thresh = 0.6f;
+	 return index_middle_cos >  thresh &&
+	        // ring_pinky_cos   >  thresh &&
+	        index_pinky_cos  < 0;
 }
 
 bool UltraleapPoller::isRotated(const LEAP_HAND* hand) const

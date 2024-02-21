@@ -18,7 +18,6 @@ void SetMouseActive(bool active)
 
 void SetScrolling(bool scrolling)
 {
-	std::cout << "Setting scrolling to " << (Scrolling ? "true" : "false") << std::endl;
 	Scrolling = scrolling;
 }
 
@@ -124,30 +123,55 @@ int main(int argc, char** argv)
 
 	printf("Setting up..");
 	UltraleapPoller ulp;
-	ulp.SetOnFistStartCallback([](eLeapHandType) { 
+	ulp.SetOnFistStartCallback([](const LEAP_HAND&) { 
 			// printf("Fist start\n");
 		SetMouseActive(false); });
-	ulp.SetOnFistStopCallback([](eLeapHandType) {
+	ulp.SetOnFistStopCallback([](const LEAP_HAND&) {
 		// printf("Fist stopped\n");
 		SetMouseActive(true); });
-	ulp.SetOnIndexPinchStartCallback([](eLeapHandType) { 
+	ulp.SetOnAlmostPinchStartCallback([](const LEAP_HAND&) { 
+		SetMouseActive(false); });
+	ulp.SetOnAlmostPinchStopCallback([](const LEAP_HAND&) {
+		SetMouseActive(true); });
+	ulp.SetOnIndexPinchStartCallback([](const LEAP_HAND&) { 
 		// printf("Pinch started\n");
 		PrimaryDown(); });
-	ulp.SetOnIndexPinchStopCallback([](eLeapHandType) {
+	ulp.SetOnIndexPinchStopCallback([](const LEAP_HAND&) {
 		// printf("Pinch stopped\n");
 		PrimaryUp(); });
-	ulp.SetOnRotateStartCallback([](eLeapHandType) {
+	ulp.SetOnAlmostRotateStartCallback([](const LEAP_HAND&) {
+        SetMouseActive(false);
+    });
+	ulp.SetOnAlmostRotateStopCallback([](const LEAP_HAND&) {
+        SetMouseActive(true);
+    });
+	ulp.SetOnRotateStartCallback([](const LEAP_HAND&) {
 			// printf("Rotate started\n");
 		SecondaryDown();
     });
-	ulp.SetOnRotateStopCallback([](eLeapHandType) {
+	ulp.SetOnRotateStopCallback([](const LEAP_HAND&) {
 			// printf("Rotate stopped\n");
 		SecondaryUp();
     });
-	ulp.SetOnVStartCallback([](eLeapHandType) {
+	ulp.SetOnVStartCallback([](const LEAP_HAND&) {
 		SetScrolling(true);
     });
-	ulp.SetOnVStopCallback([](eLeapHandType) {
+	ulp.SetOnVContinueCallback([&config](const LEAP_HAND& h){
+        float palmToFingertipDist = h.middle.distal.next_joint.y - h.palm.position.y;
+
+        float move = config.GetScrollingSpeed() *2;
+
+		if (palmToFingertipDist > 20.f)
+		{
+		    VerticalScroll(static_cast<int>(move));	     
+        }
+		else if (palmToFingertipDist < -20.f)
+		{
+		    VerticalScroll(static_cast<int>(-move));	     
+        }
+
+	});
+	ulp.SetOnVStopCallback([](const LEAP_HAND&) {
 		SetScrolling(false);
     });
 
@@ -162,9 +186,10 @@ int main(int argc, char** argv)
 			int xMove = static_cast<int>(config.GetSpeed() * (v.x - PrevPos.x));
 			float yMove = (v.y - PrevPos.y) * (config.IsVerticalOrientation() ? -1 : 1);
 
-		    if (config.GetUseScrolling() && Scrolling)
+		    // if (config.GetUseScrolling() && Scrolling)
+		    if (Scrolling && config.GetLockMouseOnScroll())
 			{
-		            VerticalScroll(static_cast<int>(config.GetScrollingSpeed() * yMove));	     
+		            // VerticalScroll(static_cast<int>(config.GetScrollingSpeed() * yMove));	     
 			}
 			else
 			{
