@@ -135,337 +135,6 @@ void UltraleapPoller::handleDeviceMessage(const LEAP_DEVICE_EVENT* device_event)
   LeapCloseDevice(dev);
 }
 
-void UltraleapPoller::almostPinchChecks(const LEAP_HAND* hand)
-{
-  if (isAlmostPinching(hand))
-  {
-		if (doingPinch_)
-		{
-			if (almostPinchContinueCallback_)
-			{
-				almostPinchContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (almostPinchStartCallback_)
-			{
-				almostPinchStartCallback_(*hand);
-			}
-			doingAlmostPinch_ = true;
-		}
-  }
-  else
-  {
-		if (doingAlmostPinch_)
-		{
-			if (almostPinchStopCallback_)
-			{
-				almostPinchStopCallback_(*hand);
-			}
-			doingAlmostPinch_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::pinchChecks(const LEAP_HAND* hand)
-{
-  if (isPinching(hand))
-  {
-		if (doingPinch_)
-		{
-			if (pinchContinueCallback_)
-			{
-				pinchContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (pinchStartCallback_)
-			{
-				pinchStartCallback_(*hand);
-			}
-			doingPinch_ = true;
-		}
-  }
-  else
-  {
-		if (doingPinch_)
-		{
-			if (pinchStopCallback_)
-			{
-				pinchStopCallback_(*hand);
-			}
-			doingPinch_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::indexPinchChecks(const LEAP_HAND* hand)
-{
-  if (isIndexPinching(hand))
-  {
-		if (doingIndexPinch_)
-		{
-			if (indexPinchContinueCallback_)
-			{
-				indexPinchContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (indexPinchStartCallback_)
-			{
-				indexPinchStartCallback_(*hand);
-			}
-			doingIndexPinch_ = true;
-		}
-  }
-  else
-  {
-		if (doingIndexPinch_)
-		{
-			if (indexPinchStopCallback_)
-			{
-				indexPinchStopCallback_(*hand);
-			}
-			doingIndexPinch_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::middlePinchChecks(const LEAP_HAND* hand)
-{
-  if (isMiddlePinching(hand))
-  {
-		if (doingMiddlePinch_)
-		{
-			if (middlePinchContinueCallback_)
-			{
-				middlePinchContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (middlePinchStartCallback_)
-			{
-				middlePinchStartCallback_(*hand);
-			}
-			doingMiddlePinch_ = true;
-		}
-  }
-  else
-  {
-		if (doingMiddlePinch_)
-		{
-			if (middlePinchStopCallback_)
-			{
-				middlePinchStopCallback_(*hand);
-			}
-			doingMiddlePinch_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::ringPinchChecks(const LEAP_HAND* hand)
-{
-  if (isRingPinching(hand))
-  {
-		if (doingRingPinch_)
-		{
-			if (ringPinchContinueCallback_)
-			{
-				ringPinchContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (ringPinchStartCallback_)
-			{
-				ringPinchStartCallback_(*hand);
-			}
-			doingRingPinch_ = true;
-		}
-  }
-  else
-  {
-		if (doingRingPinch_)
-		{
-			if (ringPinchStopCallback_)
-			{
-				ringPinchStopCallback_(*hand);
-			}
-			doingRingPinch_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::pinkyPinchChecks(const LEAP_HAND* hand)
-{
-  if (isPinkyPinching(hand))
-  {
-		if (doingPinkyPinch_)
-		{
-			if (pinkyPinchContinueCallback_)
-			{
-				pinkyPinchContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (pinkyPinchStartCallback_)
-			{
-				pinkyPinchStartCallback_(*hand);
-			}
-			doingPinkyPinch_ = true;
-		}
-  }
-  else
-  {
-		if (doingPinkyPinch_)
-		{
-			if (pinkyPinchStopCallback_)
-			{
-				pinkyPinchStopCallback_(*hand);
-			}
-			doingPinkyPinch_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::fistChecks(const LEAP_HAND* hand)
-{
-  if (isFist(hand))
-  {
-		if (doingFist_)
-		{
-			if (fistContinueCallback_)
-			{
-				fistContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (fistStartCallback_)
-			{
-				fistStartCallback_(*hand);
-			}
-			doingFist_ = true;
-		}
-  }
-  else
-  {
-		if (doingFist_)
-		{
-			if (fistStopCallback_)
-			{
-				fistStopCallback_(*hand);
-			}
-			doingFist_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::VChecks(const LEAP_HAND* hand)
-{
-  // if (isV(hand))
-  if (isV2(hand))
-  {
-		if (doingV_)
-		{
-			if (VContinueCallback_)
-			{
-				VContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (VStartCallback_)
-			{
-				VStartCallback_(*hand);
-			}
-			doingV_ = true;
-		}
-  }
-  else
-  {
-		if (doingV_)
-		{
-			if (VStopCallback_)
-			{
-				VStopCallback_(*hand);
-			}
-			doingV_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::almostRotateChecks(const LEAP_HAND* hand)
-{
-  if (isAlmostRotated(hand))
-  {
-		if (doingAlmostRotate_)
-		{
-			if (almostRotateContinueCallback_)
-			{
-				almostRotateContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (almostRotateStartCallback_)
-			{
-				almostRotateStartCallback_(*hand);
-			}
-			doingAlmostRotate_ = true;
-		}
-  }
-  else
-  {
-		if (doingAlmostRotate_)
-		{
-			if (almostRotateStopCallback_)
-			{
-				almostRotateStopCallback_(*hand);
-			}
-			doingAlmostRotate_ = false;
-		}
-  }
-}
-
-void UltraleapPoller::rotateChecks(const LEAP_HAND* hand)
-{
-  if (isRotated(hand))
-  {
-		if (doingRotate_)
-		{
-			if (rotateContinueCallback_)
-			{
-				rotateContinueCallback_(*hand);
-			}
-		}
-		else
-		{
-			if (rotateStartCallback_)
-			{
-				rotateStartCallback_(*hand);
-			}
-			doingRotate_ = true;
-		}
-  }
-  else
-  {
-		if (doingRotate_)
-		{
-			if (rotateStopCallback_)
-			{
-				rotateStopCallback_(*hand);
-			}
-			doingRotate_ = false;
-		}
-  }
-}
-
 void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_event)
 {
   if (tracking_event->nHands)
@@ -487,14 +156,20 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 						positionCallback_(hand.palm.position);
 					}
 					
-					pinchChecks(&hand);
-					indexPinchChecks(&hand);
-					middlePinchChecks(&hand);
-					ringPinchChecks(&hand);
-					pinkyPinchChecks(&hand);
-					fistChecks(&hand);
+					// The following need to be added manually, the macro can't do it
+					AlmostPinchChecks(&hand);
+					FistChecks(&hand);
+					if (!doingFist_) // A fist is also detected as a pinch, but not the other way round
+					{
+					    PinchChecks(&hand);
+					}
+					IndexPinchChecks(&hand);
+					MiddlePinchChecks(&hand);
+					RingPinchChecks(&hand);
+					PinkyPinchChecks(&hand);
 					VChecks(&hand);
-					rotateChecks(&hand);
+					AlmostRotateChecks(&hand);
+					RotateChecks(&hand);
 				}
 			}
 			else
@@ -540,270 +215,75 @@ void UltraleapPoller::SetPositionCallback(position_callback_t callback)
 	positionCallback_ = callback;
 }
 
-void UltraleapPoller::SetOnAlmostPinchStartCallback(gesture_callback_t callback)
-{
-	almostPinchStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnAlmostPinchContinueCallback(gesture_callback_t callback)
-{
-	almostPinchContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnAlmostPinchStopCallback(gesture_callback_t callback)
-{
-	almostPinchStopCallback_ = callback;
-}
-
-void UltraleapPoller::SetOnPinchStartCallback(gesture_callback_t callback)
-{
-	pinchStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnPinchContinueCallback(gesture_callback_t callback)
-{
-	pinchContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnPinchStopCallback(gesture_callback_t callback)
-{
-	pinchStopCallback_ = callback;
-}
-
-void UltraleapPoller::SetOnIndexPinchStartCallback(gesture_callback_t callback)
-{
-	indexPinchStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnIndexPinchContinueCallback(gesture_callback_t callback)
-{
-	indexPinchContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnIndexPinchStopCallback(gesture_callback_t callback)
-{
-	indexPinchStopCallback_ = callback;
-}
-
-void UltraleapPoller::SetOnMiddlePinchStartCallback(gesture_callback_t callback)
-{
-	middlePinchStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnMiddlePinchContinueCallback(gesture_callback_t callback)
-{
-	middlePinchContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnMiddlePinchStopCallback(gesture_callback_t callback)
-{
-	middlePinchStopCallback_ = callback;
-}
-
-void UltraleapPoller::SetOnRingPinchStartCallback(gesture_callback_t callback)
-{
-	ringPinchStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnRingPinchContinueCallback(gesture_callback_t callback)
-{
-	ringPinchContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnRingPinchStopCallback(gesture_callback_t callback)
-{
-	ringPinchStopCallback_ = callback;
+#define AddGestureCallbackSettersDefinition(name) \
+void UltraleapPoller::SetOn##name##StartCallback(gesture_callback_t callback) \
+{ \
+	name##StartCallback_ = callback; \
+} \
+void UltraleapPoller::SetOn##name##ContinueCallback(gesture_callback_t callback) \
+{ \
+	name##ContinueCallback_ = callback; \
+} \
+void UltraleapPoller::SetOn##name##StopCallback(gesture_callback_t callback) \
+{ \
+	name##StopCallback_ = callback; \
+} \
+void UltraleapPoller::ClearOn##name##StartCallback() \
+{ \
+	name##StartCallback_ = nullptr; \
+} \
+void UltraleapPoller::ClearOn##name##ContinueCallback() \
+{ \
+	name##ContinueCallback_ = nullptr; \
+} \
+void UltraleapPoller::ClearOn##name##StopCallback() \
+{ \
+	name##StopCallback_ = nullptr; \
+} \
+void UltraleapPoller::name##Checks(const LEAP_HAND* hand) \
+{ \
+  if (is##name##(hand)) \
+  { \
+		if (doing##name##_) \
+		{ \
+			if (name##ContinueCallback_) \
+			{ \
+				name##ContinueCallback_(*hand); \
+			} \
+		} \
+		else \
+		{ \
+			if (name##StartCallback_) \
+			{ \
+				name##StartCallback_(*hand); \
+			} \
+			doing##name##_ = true; \
+		} \
+  } \
+  else \
+  { \
+		if (doing##name##_) \
+		{ \
+			if (name##StopCallback_) \
+			{ \
+				name##StopCallback_(*hand); \
+			} \
+			doing##name##_ = false; \
+		} \
+  } \
 }
 
-void UltraleapPoller::SetOnPinkyPinchStartCallback(gesture_callback_t callback)
-{
-	pinkyPinchStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnPinkyPinchContinueCallback(gesture_callback_t callback)
-{
-	pinkyPinchContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnPinkyPinchStopCallback(gesture_callback_t callback)
-{
-	pinkyPinchStopCallback_ = callback;
-}
 
-void UltraleapPoller::SetOnFistStartCallback(gesture_callback_t callback)
-{
-	fistStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnFistContinueCallback(gesture_callback_t callback)
-{
-	fistContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnFistStopCallback(gesture_callback_t callback)
-{
-	fistStopCallback_ = callback;
-}
-
-void UltraleapPoller::SetOnVStartCallback(gesture_callback_t callback)
-{
-	VStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnVContinueCallback(gesture_callback_t callback)
-{
-	VContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnVStopCallback(gesture_callback_t callback)
-{
-	VStopCallback_ = callback;
-}
-
-void UltraleapPoller::SetOnAlmostRotateStartCallback(gesture_callback_t callback)
-{
-	almostRotateStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnAlmostRotateContinueCallback(gesture_callback_t callback)
-{
-	almostRotateContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnAlmostRotateStopCallback(gesture_callback_t callback)
-{
-	almostRotateStopCallback_ = callback;
-}
-
-void UltraleapPoller::SetOnRotateStartCallback(gesture_callback_t callback)
-{
-	rotateStartCallback_ = callback;
-}
-void UltraleapPoller::SetOnRotateContinueCallback(gesture_callback_t callback)
-{
-	rotateContinueCallback_ = callback;
-}
-void UltraleapPoller::SetOnRotateStopCallback(gesture_callback_t callback)
-{
-	rotateStopCallback_ = callback;
-}
-
-void UltraleapPoller::ClearPositionCallback()
-{
-	positionCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnAlmostPinchStartCallback()
-{
-	almostPinchStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnAlmostPinchContinueCallback()
-{
-	almostPinchContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnAlmostPinchStopCallback()
-{
-	almostPinchStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnPinchStartCallback()
-{
-	pinchStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnPinchContinueCallback()
-{
-	pinchContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnPinchStopCallback()
-{
-	pinchStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnIndexPinchStartCallback()
-{
-	indexPinchStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnIndexPinchContinueCallback()
-{
-	indexPinchContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnIndexPinchStopCallback()
-{
-	indexPinchStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnMiddlePinchStartCallback()
-{
-	middlePinchStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnMiddlePinchContinueCallback()
-{
-	middlePinchContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnMiddlePinchStopCallback()
-{
-	middlePinchStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnRingPinchStartCallback()
-{
-	ringPinchStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnRingPinchContinueCallback()
-{
-	ringPinchContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnRingPinchStopCallback()
-{
-	ringPinchStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnPinkyPinchStartCallback()
-{
-	pinkyPinchStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnPinkyPinchContinueCallback()
-{
-	pinkyPinchContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnPinkyPinchStopCallback()
-{
-	pinkyPinchStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnFistStartCallback()
-{
-	fistStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnFistContinueCallback()
-{
-	fistContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnFistStopCallback()
-{
-	fistStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnVStartCallback()
-{
-	VStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnVContinueCallback()
-{
-	VContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnVStopCallback()
-{
-	VStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnAlmostRotateStartCallback()
-{
-	almostRotateStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnAlmostRotateContinueCallback()
-{
-	almostRotateContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnAlmostRotateStopCallback()
-{
-	almostRotateStopCallback_ = nullptr;
-}
-
-void UltraleapPoller::ClearOnRotateStartCallback()
-{
-	rotateStartCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnRotateContinueCallback()
-{
-	rotateContinueCallback_ = nullptr;
-}
-void UltraleapPoller::ClearOnRotateStopCallback()
-{
-	rotateStopCallback_ = nullptr;
-}
+AddGestureCallbackSettersDefinition(AlmostPinch);
+AddGestureCallbackSettersDefinition(Pinch);
+AddGestureCallbackSettersDefinition(IndexPinch);
+AddGestureCallbackSettersDefinition(MiddlePinch);
+AddGestureCallbackSettersDefinition(RingPinch);
+AddGestureCallbackSettersDefinition(PinkyPinch);
+AddGestureCallbackSettersDefinition(Fist);
+AddGestureCallbackSettersDefinition(V);
+AddGestureCallbackSettersDefinition(AlmostRotate);
+AddGestureCallbackSettersDefinition(Rotate);
 
 float UltraleapPoller::distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const
 {
@@ -836,17 +316,18 @@ float UltraleapPoller::magnitude(const LEAP_VECTOR vec) const
 		(vec.z * vec.z));
 }
 
-bool UltraleapPoller::isAlmostPinching(const LEAP_HAND* hand) const
+// The following gesture tests need to be added manually and match names given to the macro above
+bool UltraleapPoller::isAlmostPinch(const LEAP_HAND* hand) const
 {
 	return hand->pinch_strength < pinchThreshold_ && hand->pinch_strength > (pinchThreshold_ - 0.15);
 }
 
-bool UltraleapPoller::isPinching(const LEAP_HAND* hand) const
+bool UltraleapPoller::isPinch(const LEAP_HAND* hand) const
 {
 	return hand->pinch_strength > pinchThreshold_;
 }
 
-bool UltraleapPoller::isIndexPinching(const LEAP_HAND* hand) const
+bool UltraleapPoller::isIndexPinch(const LEAP_HAND* hand) const
 {
 	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  < indexPinchThreshold_ &&
 	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > indexPinchThreshold_ &&
@@ -855,7 +336,7 @@ bool UltraleapPoller::isIndexPinching(const LEAP_HAND* hand) const
 }
 
 
-bool UltraleapPoller::isMiddlePinching(const LEAP_HAND* hand) const
+bool UltraleapPoller::isMiddlePinch(const LEAP_HAND* hand) const
 {
 	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  > middlePinchThreshold_ &&
 	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) < middlePinchThreshold_ &&
@@ -863,7 +344,7 @@ bool UltraleapPoller::isMiddlePinching(const LEAP_HAND* hand) const
 	       distance(hand->pinky.distal.next_joint, hand->thumb.distal.next_joint)  > middlePinchThreshold_;
 }
 
-bool UltraleapPoller::isRingPinching(const LEAP_HAND* hand) const
+bool UltraleapPoller::isRingPinch(const LEAP_HAND* hand) const
 {
 	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  > ringPinchThreshold_ &&
 	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > ringPinchThreshold_ &&
@@ -871,7 +352,7 @@ bool UltraleapPoller::isRingPinching(const LEAP_HAND* hand) const
 	       distance(hand->pinky.distal.next_joint, hand->thumb.distal.next_joint)  > ringPinchThreshold_;
 }
 
-bool UltraleapPoller::isPinkyPinching(const LEAP_HAND* hand) const
+bool UltraleapPoller::isPinkyPinch(const LEAP_HAND* hand) const
 {
 	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  > pinkyPinchThreshold_ &&
 	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > pinkyPinchThreshold_ &&
@@ -884,15 +365,15 @@ bool UltraleapPoller::isFist(const LEAP_HAND* hand) const
 	return hand->grab_strength > fistThreshold_;
 }
 
-bool UltraleapPoller::isV(const LEAP_HAND* hand) const
-{
-     return distance(hand->index.distal.next_joint, hand->palm.position)  > 65.f &&
-            distance(hand->middle.distal.next_joint, hand->palm.position) > 65.f &&
-            distance(hand->ring.distal.next_joint, hand->palm.position)   < 40.f &&
-            distance(hand->pinky.distal.next_joint, hand->palm.position)  < 40.f;
-}
+// bool UltraleapPoller::isV(const LEAP_HAND* hand) const
+// {
+//      return distance(hand->index.distal.next_joint, hand->palm.position)  > 65.f &&
+//             distance(hand->middle.distal.next_joint, hand->palm.position) > 65.f &&
+//             distance(hand->ring.distal.next_joint, hand->palm.position)   < 40.f &&
+//             distance(hand->pinky.distal.next_joint, hand->palm.position)  < 40.f;
+// }
 
-bool UltraleapPoller::isV2(const LEAP_HAND* hand) const
+bool UltraleapPoller::isV(const LEAP_HAND* hand) const
 {
      LEAP_VECTOR index_vec  = difference(hand->index.distal.next_joint, hand->index.distal.prev_joint);
      LEAP_VECTOR middle_vec = difference(hand->middle.distal.next_joint, hand->middle.distal.prev_joint);
@@ -909,14 +390,14 @@ bool UltraleapPoller::isV2(const LEAP_HAND* hand) const
 	        index_pinky_cos  < 0;
 }
 
-bool UltraleapPoller::isAlmostRotated(const LEAP_HAND* hand) const
+bool UltraleapPoller::isAlmostRotate(const LEAP_HAND* hand) const
 {
-     float angle = std::sqrt(std::pow(hand->index.proximal.prev_joint.x - hand->pinky.proximal.prev_joint.x, 2) +
+     double angle = std::sqrt(std::pow(hand->index.proximal.prev_joint.x - hand->pinky.proximal.prev_joint.x, 2) +
                       std::pow(hand->index.proximal.prev_joint.z - hand->pinky.proximal.prev_joint.z, 2));
-     return angle > rotationThreshold_ && angle < rotationThreshold_ + 20.0f;
+     return angle > rotationThreshold_ && angle < rotationThreshold_ + 20.0;
 }
 
-bool UltraleapPoller::isRotated(const LEAP_HAND* hand) const
+bool UltraleapPoller::isRotate(const LEAP_HAND* hand) const
 {
      return std::sqrt(std::pow(hand->index.proximal.prev_joint.x - hand->pinky.proximal.prev_joint.x, 2) +
                       std::pow(hand->index.proximal.prev_joint.z - hand->pinky.proximal.prev_joint.z, 2)) < rotationThreshold_;
