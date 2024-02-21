@@ -19,6 +19,10 @@ class UltraleapPoller
 		// Fires on each update with a hand
 		void SetPositionCallback(position_callback_t callback);
 
+		void SetOnAlmostPinchStartCallback(gesture_callback_t callback);
+		void SetOnAlmostPinchContinueCallback(gesture_callback_t callback);
+		void SetOnAlmostPinchStopCallback(gesture_callback_t callback);
+
 		void SetOnPinchStartCallback(gesture_callback_t callback);
 		void SetOnPinchContinueCallback(gesture_callback_t callback);
 		void SetOnPinchStopCallback(gesture_callback_t callback);
@@ -47,11 +51,19 @@ class UltraleapPoller
 		void SetOnVContinueCallback(gesture_callback_t callback);
 		void SetOnVStopCallback(gesture_callback_t callback);
 
+		void SetOnAlmostRotateStartCallback(gesture_callback_t callback);
+		void SetOnAlmostRotateContinueCallback(gesture_callback_t callback);
+		void SetOnAlmostRotateStopCallback(gesture_callback_t callback);
+
 		void SetOnRotateStartCallback(gesture_callback_t callback);
 		void SetOnRotateContinueCallback(gesture_callback_t callback);
 		void SetOnRotateStopCallback(gesture_callback_t callback);
 
 		void ClearPositionCallback();
+
+		void ClearOnAlmostPinchStartCallback();
+		void ClearOnAlmostPinchContinueCallback();
+		void ClearOnAlmostPinchStopCallback();
 
 		void ClearOnPinchStartCallback();
 		void ClearOnPinchContinueCallback();
@@ -81,6 +93,10 @@ class UltraleapPoller
 		void ClearOnVContinueCallback();
 		void ClearOnVStopCallback();
 
+		void ClearOnAlmostRotateStartCallback();
+		void ClearOnAlmostRotateContinueCallback();
+		void ClearOnAlmostRotateStopCallback();
+
 		void ClearOnRotateStartCallback();
 		void ClearOnRotateContinueCallback();
 		void ClearOnRotateStopCallback();
@@ -92,6 +108,7 @@ class UltraleapPoller
 		float dot(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
        float magnitude(const LEAP_VECTOR vec) const;
 
+		bool isAlmostPinching(const LEAP_HAND* hand) const;
 		bool isPinching(const LEAP_HAND* hand) const;
 		bool isIndexPinching(const LEAP_HAND* hand) const;
 		bool isMiddlePinching(const LEAP_HAND *hand) const;
@@ -100,11 +117,13 @@ class UltraleapPoller
 		bool isFist(const LEAP_HAND *hand) const;
 		bool isV(const LEAP_HAND* hand) const;
         bool isV2(const LEAP_HAND* hand) const;
+		bool isAlmostRotated(const LEAP_HAND* hand) const;
 		bool isRotated(const LEAP_HAND* hand) const;
 
 		void handleDeviceMessage(const LEAP_DEVICE_EVENT *device_event);
 		void handleTrackingMessage(const LEAP_TRACKING_EVENT *tracking_event);
 		
+		void almostPinchChecks(const LEAP_HAND* hand);
 		void pinchChecks(const LEAP_HAND* hand);
 		void indexPinchChecks(const LEAP_HAND* hand);
 		void middlePinchChecks(const LEAP_HAND* hand);
@@ -112,6 +131,7 @@ class UltraleapPoller
 		void pinkyPinchChecks(const LEAP_HAND* hand);
 		void fistChecks(const LEAP_HAND* hand);
 		void VChecks(const LEAP_HAND* hand);
+		void almostRotateChecks(const LEAP_HAND* hand);
 		void rotateChecks(const LEAP_HAND* hand);
 
 	private:
@@ -129,6 +149,10 @@ class UltraleapPoller
 		gesture_callback_t pinchStartCallback_;
 		gesture_callback_t pinchContinueCallback_;
 		gesture_callback_t pinchStopCallback_;
+
+		gesture_callback_t almostPinchStartCallback_;
+		gesture_callback_t almostPinchContinueCallback_;
+		gesture_callback_t almostPinchStopCallback_;
 
 		gesture_callback_t indexPinchStartCallback_;
 		gesture_callback_t indexPinchContinueCallback_;
@@ -154,6 +178,10 @@ class UltraleapPoller
 		gesture_callback_t VContinueCallback_;
 		gesture_callback_t VStopCallback_;
 
+		gesture_callback_t almostRotateStartCallback_;
+		gesture_callback_t almostRotateContinueCallback_;
+		gesture_callback_t almostRotateStopCallback_;
+
 		gesture_callback_t rotateStartCallback_;
 		gesture_callback_t rotateContinueCallback_;
 		gesture_callback_t rotateStopCallback_;
@@ -163,6 +191,7 @@ class UltraleapPoller
 		
 		uint32_t activeHandID = 0;
 
+		bool doingAlmostPinch_ = false;
 		bool doingPinch_ = false;
 		bool doingIndexPinch_ = false;
 		bool doingMiddlePinch_ = false;
@@ -170,5 +199,6 @@ class UltraleapPoller
 		bool doingPinkyPinch_ = false;
 		bool doingFist_ = false;
 		bool doingV_ = false;
+		bool doingAlmostRotate_ = false;
 		bool doingRotate_ = false;
 };
