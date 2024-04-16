@@ -7,25 +7,59 @@
 
 #define CONFIG_FILE_NAME "fledermaus_config.json"
 
-#define SPEED_NAME "Speed"
-#define LOCK_MOUSE_ON_SCROLL_NAME "LockMouseOnScroll"
-#define SCROLLING_ON_NAME "ScrollingActive"
-#define SCROLLING_SPEED_NAME "ScrollingSpeed"
-#define ORIENTATION_NAME "Orientation"
+#define SPEED_NAME Speed
+#define FIST_TO_LIFT_NAME FistToLiftActive
+#define RIGHT_CLICK_ACTIVE_NAME RightClickActive
+#define LOCK_MOUSE_ON_SCROLL_NAME LockMouseOnScroll
+#define SCROLLING_ON_NAME ScrollingActive
+#define SCROLLING_SPEED_NAME ScrollingSpeed
+#define ORIENTATION_NAME VerticalOrientation
+
+#define STRINGIFY(x) #x
+#define STRINGIFY_HELPER(x) STRINGIFY(x)
+#define TOKENPASTE_HELPER(x, y) x ## y
+#define TOKENPASTE(x, y) TOKENPASTE_HELPER(x, y)
 
 namespace rjs=rapidjson;
 
 
+#define SETTERS_AND_GETTERS_BOOL(name, def) private: \
+    bool TOKENPASTE(name, _) = def; \
+    public: \
+    void TOKENPASTE(Set, name)(const bool name) \
+    { \
+        TOKENPASTE(name, _) = name; \
+    } \
+    bool TOKENPASTE(Get, name)##() \
+    { \
+        return TOKENPASTE(name, _); \
+    }
+
+#define SETTERS_AND_GETTERS_FLOAT(name, default) private: \
+    float TOKENPASTE(name, _) = default; \
+    public: \
+    void TOKENPASTE(Set, name)(const float name) \
+    { \
+        TOKENPASTE(name, _) = name; \
+    } \
+    float TOKENPASTE(Get, name) ##() \
+    { \
+        return TOKENPASTE(name, _); \
+    }
+
 class ConfigReader {
+
+    SETTERS_AND_GETTERS_FLOAT(SPEED_NAME, 2.0f);
+    SETTERS_AND_GETTERS_BOOL(SCROLLING_ON_NAME, true);
+    SETTERS_AND_GETTERS_FLOAT(SCROLLING_SPEED_NAME, 2.0f);
+    SETTERS_AND_GETTERS_BOOL(ORIENTATION_NAME, true);
+    SETTERS_AND_GETTERS_BOOL(LOCK_MOUSE_ON_SCROLL_NAME, true);
+    SETTERS_AND_GETTERS_BOOL(RIGHT_CLICK_ACTIVE_NAME, true);
+    SETTERS_AND_GETTERS_BOOL(FIST_TO_LIFT_NAME, true);
+
     private:
     std::string config_file_name_;
     rjs::Document d_;
-
-    float speed_ = 2.0f;
-    bool use_scrolling_ = true;
-    float scrolling_speed_ = 2.0f;
-    bool vertical_orientation_ = true;
-    bool lockMouseOnScroll_ = true;
 
     public:
     ConfigReader(std::string config_file_name) :
@@ -46,6 +80,10 @@ class ConfigReader {
 
             validateAndLoadJson(); 
         }
+        else
+        {
+            printf("Couldn't find config file.\n");
+        }
     }
 
     ConfigReader() : ConfigReader(CONFIG_FILE_NAME)
@@ -53,109 +91,89 @@ class ConfigReader {
 
     ~ConfigReader() {}
 
-    void SetSpeed(const float speed)
+    void print()
     {
-        speed_ = speed;
-    }
-
-    void SetLockMouseOnScroll(const bool lockMouseOnScroll)
-    {
-        lockMouseOnScroll_ = lockMouseOnScroll;
-    }
-
-    void SetUseScrolling(const bool use_scrolling)
-    {
-        use_scrolling_ = use_scrolling;
-    }
-
-    void SetScrollingSpeed(const float scrollingSpeed)
-    {
-        scrolling_speed_ = scrollingSpeed;
-    }
-
-    void SetVerticalOrientation(const bool v)
-    {
-        vertical_orientation_ = v;
-    }
-
-    void SetHorizontalOrientation(const bool h)
-    {
-        vertical_orientation_ = !h;
-    }
-
-    float GetSpeed() const
-    {
-        return speed_;
-    }
-
-    bool GetLockMouseOnScroll()
-    {
-        return lockMouseOnScroll_;
-    }
-
-    bool GetUseScrolling() const
-    {
-        return use_scrolling_;
-    }
-
-    float GetScrollingSpeed() const
-    {
-        return scrolling_speed_;
-    }
-
-    bool IsVerticalOrientation() const
-    {
-        return vertical_orientation_;
-    }
-
-    bool IsHorizontalOrientation() const
-    {
-        return !vertical_orientation_;
+        printf( STRINGIFY_HELPER(SPEED_NAME) ": %f\n", TOKENPASTE(SPEED_NAME, _));
+        printf( STRINGIFY_HELPER(FIST_TO_LIFT_NAME) ": %s\n", TOKENPASTE(FIST_TO_LIFT_NAME, _) ? "true" : "false");
+        printf( STRINGIFY_HELPER(RIGHT_CLICK_ACTIVE_NAME) ": %s\n", TOKENPASTE(RIGHT_CLICK_ACTIVE_NAME, _) ? "true" : "false");
+        printf( STRINGIFY_HELPER(LOCK_MOUSE_ON_SCROLL_NAME) ": %s\n", TOKENPASTE(LOCK_MOUSE_ON_SCROLL_NAME, _) ? "true" : "false");
+        printf( STRINGIFY_HELPER(SCROLLING_ON_NAME) ": %s\n", TOKENPASTE(SCROLLING_ON_NAME, _) ? "true" : "false");
+        printf( STRINGIFY_HELPER(SCROLLING_SPEED_NAME) ": %f\n", TOKENPASTE(SCROLLING_SPEED_NAME, _));
+        printf( STRINGIFY_HELPER(ORIENTATION_NAME) ": %s\n", TOKENPASTE(ORIENTATION_NAME, _) ? "true" : "false");
     }
 
     private:
     void validateAndLoadJson()
     {
-        if (d_.HasMember(ORIENTATION_NAME))
+        if (d_.HasMember(STRINGIFY_HELPER(ORIENTATION_NAME )))
         {
-            assert(d_[ORIENTATION_NAME].IsString());
+            // assert(d_[STRINGIFY_HELPER(ORIENTATION_NAME)].IsString());
 
-            if (d_[ORIENTATION_NAME].GetString() == "vertical")
-            {
-                vertical_orientation_ = true;
-            }
-            else if (d_[ORIENTATION_NAME].GetString() == "horizontal")
-            {
-                vertical_orientation_ = false;
-            }
-            else
-            {
-                // Use default. This is an error condition really
-            }
+            TOKENPASTE(ORIENTATION_NAME, _) = d_[STRINGIFY_HELPER(ORIENTATION_NAME)].GetBool();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(ORIENTATION_NAME) " not found!\n");
         }
         
-        if (d_.HasMember(SPEED_NAME))
+        if (d_.HasMember(STRINGIFY_HELPER(SPEED_NAME)))
         {
-            assert(d_[SPEED_NAME].IsNumber());
-            speed_ = d_[SPEED_NAME].GetFloat();
+            // assert(d_[STRINGIFY(SPEED_NAME)].IsNumber());
+            TOKENPASTE(SPEED_NAME, _) = d_[STRINGIFY_HELPER(SPEED_NAME)].GetFloat();
         }
-
-        if (d_.HasMember(LOCK_MOUSE_ON_SCROLL_NAME))
+        else
         {
-            assert(d_[LOCK_MOUSE_ON_SCROLL_NAME].IsBool());
-            use_scrolling_= d_[LOCK_MOUSE_ON_SCROLL_NAME].GetBool();
-        }
-
-        if (d_.HasMember(SCROLLING_ON_NAME))
-        {
-            assert(d_[SCROLLING_ON_NAME].IsBool());
-            use_scrolling_= d_[SCROLLING_ON_NAME].GetBool();
+            printf(STRINGIFY_HELPER(SPEED_NAME) " not found!\n");
         }
         
-        if (d_.HasMember(SCROLLING_SPEED_NAME))
+        if (d_.HasMember(STRINGIFY_HELPER(FIST_TO_LIFT_NAME)))
         {
-            assert(d_[SCROLLING_SPEED_NAME].IsFloat());
-            speed_ = d_[SCROLLING_SPEED_NAME].GetFloat();
+            // assert(d_[STRINGIFY(SCROLLING_SPEED_NAME)].IsFloat());
+            TOKENPASTE(FIST_TO_LIFT_NAME, _) = d_[STRINGIFY_HELPER(FIST_TO_LIFT_NAME)].GetBool();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(FIST_TO_LIFT_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(RIGHT_CLICK_ACTIVE_NAME)))
+        {
+            // assert(d_[STRINGIFY(RIGHT_CLICK_ACTIVE_NAME)].IsBool());
+            TOKENPASTE(RIGHT_CLICK_ACTIVE_NAME, _) = d_[STRINGIFY_HELPER(RIGHT_CLICK_ACTIVE_NAME)].GetBool();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(RIGHT_CLICK_ACTIVE_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(LOCK_MOUSE_ON_SCROLL_NAME)))
+        {
+            // assert(d_[STRINGIFY(LOCK_MOUSE_ON_SCROLL_NAME)].IsBool());
+            TOKENPASTE(LOCK_MOUSE_ON_SCROLL_NAME, _) = d_[STRINGIFY_HELPER(LOCK_MOUSE_ON_SCROLL_NAME)].GetBool();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(LOCK_MOUSE_ON_SCROLL_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(SCROLLING_ON_NAME)))
+        {
+            // assert(d_[STRINGIFY(SCROLLING_ON_NAME)].IsBool());
+            TOKENPASTE(SCROLLING_ON_NAME, _) = d_[STRINGIFY_HELPER(SCROLLING_ON_NAME)].GetBool();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(SCROLLING_ON_NAME) " not found!\n");
+        }
+        
+        if (d_.HasMember(STRINGIFY_HELPER(SCROLLING_SPEED_NAME)))
+        {
+            // assert(d_[STRINGIFY(SCROLLING_SPEED_NAME)].IsFloat());
+            TOKENPASTE(SCROLLING_SPEED_NAME, _) = d_[STRINGIFY_HELPER(SCROLLING_SPEED_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(SCROLLING_SPEED_NAME) " not found!\n");
         }
     }
 };
