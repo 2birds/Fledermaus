@@ -1,0 +1,9 @@
+{
+    "Speed" : 2.7,
+    "FistToLiftActive" : true,
+    "RightClickActive" : true,
+    "LockMouseOnScroll" : true,
+    "ScrollingActive" : true,
+    "ScrollingSpeed" : 2,
+    "VerticalOrientation" : true
+}
