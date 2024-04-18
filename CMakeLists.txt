@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.20)
 project(Fledermaus LANGUAGES CXX VERSION 1.0.0.0)
 
 if (WIN32)
@@ -16,8 +16,8 @@ find_package(LeapSDK
      PATHS
 	 	"${ULTRALEAP_PATH_ROOT}")
 
-	file(COPY "${ULTRALEAP_PATH_ROOT}/LeapSDK/include/LeapC.h"
-		DESTINATION "${PROJECT_SOURCE_DIR}/ultraleap_poller/include/")
+	# 	file(COPY "${ULTRALEAP_PATH_ROOT}/LeapSDK/include/LeapC.h"
+	# 		DESTINATION "${PROJECT_SOURCE_DIR}/ultraleap_poller/include/")
 
 if (UNIX)    
     find_package(Threads REQUIRED)    
@@ -31,6 +31,10 @@ set(Fledermaus_SRCS
 add_executable(${PROJECT_NAME}
 	             ${Fledermaus_SRCS})
 
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE
+                           "rapidjson/include")
+
 target_link_libraries(${PROJECT_NAME}
      PUBLIC
      LeapSDK::LeapC
@@ -38,8 +42,27 @@ target_link_libraries(${PROJECT_NAME}
      mouse_control
      ultraleap_poller)
 
+get_target_property(
+	LEAPC_IMPORTED_CONFIG
+	LeapSDK::LeapC
+	IMPORTED_CONFIGURATIONS)
+
+get_target_property(
+	LEAPC_SHARED_LIB_PATH
+	LeapSDK::LeapC
+	IMPORTED_LOCATION_${LEAPC_IMPORTED_CONFIG})
+
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-	"${ULTRALEAP_PATH_ROOT}/LeapSDK/lib/x64/LeapC.dll"
-	${CMAKE_BINARY_DIR})
+	${LEAPC_SHARED_LIB_PATH}
+	$<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+	${PROJECT_SOURCE_DIR}/fledermaus_config.json
+	$<TARGET_FILE_DIR:${PROJECT_NAME}>)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+	${PROJECT_SOURCE_DIR}/LICENSE
+	$<TARGET_FILE_DIR:${PROJECT_NAME}>)
