@@ -7,13 +7,20 @@
 #include "UltraleapPoller.h"
 
 #define SECONDS_TO_MICROSECONDS(seconds) seconds * 1000000
+#define METERS_TO_MILLIMETERS(meters) meters * 1000
 
 bool MouseActive = true;
 bool Scrolling = false;
-int64_t PrevFistTimestamp;
 
+int64_t PrevFistTimestamp;
+int64_t FistStartTimestamp;
+LEAP_VECTOR FistStartPosition;
+bool CancelFistRecentering = false;
 
 LEAP_VECTOR PrevPos = {0, 0, 0};
+
+const float FIST_RECENTER_HOLD_TIME_SECONDS = 1.0f;
+const float FIST_RECENTER_DEADZONE_DISTANCE_METERS = 0.03f;
 
 void SetMouseActive(bool active)
 {
@@ -210,7 +217,12 @@ int main(int argc, char** argv)
 			{
 				SetMouseActive(false);
 
-				int64_t timeBetweenFists = timestamp - PrevFistTimestamp;
+				FistStartTimestamp = timestamp;
+				FistStartPosition = hand.palm.position;
+				CancelFistRecentering = false;
+
+				// Double fist to recenter.
+				/*int64_t timeBetweenFists = timestamp - PrevFistTimestamp;
 				if (timeBetweenFists < SECONDS_TO_MICROSECONDS(1))
 				{
 					// Recenter the mouse
@@ -219,10 +231,34 @@ int main(int argc, char** argv)
 					SetMouse(w / 2, h / 2);
 				}
 
-				PrevFistTimestamp = timestamp;
+				PrevFistTimestamp = timestamp;*/
 			}
 		);
+		ulp.SetOnFistContinueCallback(
+			[&ulp](const int64_t timestamp, const LEAP_HAND& hand)
+			{
+				if (CancelFistRecentering)
+				{
+					return;
+				}
 
+				float distance = ulp.distance(FistStartPosition, hand.palm.position);
+				if (distance > METERS_TO_MILLIMETERS(FIST_RECENTER_DEADZONE_DISTANCE_METERS))
+				{
+					CancelFistRecentering = true;
+				}
+
+				int64_t timeSinceFistStart = timestamp - FistStartTimestamp;
+				if (timeSinceFistStart > SECONDS_TO_MICROSECONDS(FIST_RECENTER_HOLD_TIME_SECONDS))
+				{
+					CancelFistRecentering = true;
+
+					int w = GetScreenWidth();
+					int h = GetScreenHeight();
+					SetMouse(w / 2, h / 2);
+				}
+			}
+		);
 		ulp.SetOnFistStopCallback([](const int64_t timestamp, const LEAP_HAND &)
 								  { SetMouseActive(true); });
 	}

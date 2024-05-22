@@ -21,6 +21,8 @@ class UltraleapPoller
         void SetPositionCallback(position_callback_t callback);
         void ClearPositionCallback();
 
+        float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
+
 // This macro sets up all callback setters and getters, tests, and flags related to a particular gesture..
 // EXCEPT the functions and values actually responsible for detecting the gesture.
 #define AddGestureCallbackSetters(name) \
@@ -52,7 +54,6 @@ class UltraleapPoller
 
     private:
         void runPoller();
-        float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
         LEAP_VECTOR difference(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
         float dot(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
         float magnitude(const LEAP_VECTOR vec) const;
