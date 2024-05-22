@@ -156,20 +156,22 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 						positionCallback_(hand.palm.position);
 					}
 					
+					int64_t timestamp = tracking_event->info.timestamp;
+
 					// The following need to be added manually, the macro can't do it
-					AlmostPinchChecks(&hand);
-					FistChecks(&hand);
+					AlmostPinchChecks(timestamp, &hand);
+					FistChecks(timestamp, &hand);
 					if (!doingFist_) // A fist is also detected as a pinch, but not the other way round
 					{
-					    PinchChecks(&hand);
+					    PinchChecks(timestamp, &hand);
 					}
-					IndexPinchChecks(&hand);
-					MiddlePinchChecks(&hand);
-					RingPinchChecks(&hand);
-					PinkyPinchChecks(&hand);
-					VChecks(&hand);
-					AlmostRotateChecks(&hand);
-					RotateChecks(&hand);
+					IndexPinchChecks(timestamp, &hand);
+					MiddlePinchChecks(timestamp, &hand);
+					RingPinchChecks(timestamp, &hand);
+					PinkyPinchChecks(timestamp, &hand);
+					VChecks(timestamp, &hand);
+					AlmostRotateChecks(timestamp, &hand);
+					RotateChecks(timestamp, &hand);
 				}
 			}
 			else
@@ -240,7 +242,7 @@ void UltraleapPoller::ClearOn##name##StopCallback() \
 { \
 	name##StopCallback_ = nullptr; \
 } \
-void UltraleapPoller::name##Checks(const LEAP_HAND* hand) \
+void UltraleapPoller::name##Checks(const int64_t timestamp, const LEAP_HAND* hand) \
 { \
   if (is##name##(hand)) \
   { \
@@ -248,14 +250,14 @@ void UltraleapPoller::name##Checks(const LEAP_HAND* hand) \
 		{ \
 			if (name##ContinueCallback_) \
 			{ \
-				name##ContinueCallback_(*hand); \
+				name##ContinueCallback_(timestamp, *hand); \
 			} \
 		} \
 		else \
 		{ \
 			if (name##StartCallback_) \
 			{ \
-				name##StartCallback_(*hand); \
+				name##StartCallback_(timestamp, *hand); \
 			} \
 			doing##name##_ = true; \
 		} \
@@ -266,7 +268,7 @@ void UltraleapPoller::name##Checks(const LEAP_HAND* hand) \
 		{ \
 			if (name##StopCallback_) \
 			{ \
-				name##StopCallback_(*hand); \
+				name##StopCallback_(timestamp, *hand); \
 			} \
 			doing##name##_ = false; \
 		} \

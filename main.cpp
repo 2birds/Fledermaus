@@ -6,8 +6,12 @@
 #include "MouseControl.h"
 #include "UltraleapPoller.h"
 
+#define SECONDS_TO_MICROSECONDS(seconds) seconds * 1000000
+
 bool MouseActive = true;
 bool Scrolling = false;
+int64_t PrevFistTimestamp;
+
 
 LEAP_VECTOR PrevPos = {0, 0, 0};
 
@@ -201,9 +205,25 @@ int main(int argc, char** argv)
 
 	if (config.GetFistToLiftActive())
 	{
-		ulp.SetOnFistStartCallback([](const LEAP_HAND &)
-								   { SetMouseActive(false); });
-		ulp.SetOnFistStopCallback([](const LEAP_HAND &)
+		ulp.SetOnFistStartCallback(
+			[](const int64_t timestamp, const LEAP_HAND &hand)
+			{
+				SetMouseActive(false);
+
+				int64_t timeBetweenFists = timestamp - PrevFistTimestamp;
+				if (timeBetweenFists < SECONDS_TO_MICROSECONDS(1))
+				{
+					// Recenter the mouse
+					int w = GetScreenWidth();
+					int h = GetScreenHeight();
+					SetMouse(w / 2, h / 2);
+				}
+
+				PrevFistTimestamp = timestamp;
+			}
+		);
+
+		ulp.SetOnFistStopCallback([](const int64_t timestamp, const LEAP_HAND &)
 								  { SetMouseActive(true); });
 	}
 	
@@ -215,24 +235,24 @@ int main(int argc, char** argv)
 	// ulp.SetOnAlmostPinchStopCallback([](const LEAP_HAND&) {
 	// 	SetMouseActive(true);
 	// 	});
-	ulp.SetOnIndexPinchStartCallback([](const LEAP_HAND&) { 
+	ulp.SetOnIndexPinchStartCallback([](const int64_t timestamp, const LEAP_HAND&) {
 		PrimaryDown(); });
-	ulp.SetOnIndexPinchStopCallback([](const LEAP_HAND&) {
+	ulp.SetOnIndexPinchStopCallback([](const int64_t timestamp, const LEAP_HAND&) {
 		PrimaryUp(); });
-	ulp.SetOnAlmostRotateStartCallback([](const LEAP_HAND&) {
+	ulp.SetOnAlmostRotateStartCallback([](const int64_t timestamp, const LEAP_HAND&) {
         SetMouseActive(false);
     });
-	ulp.SetOnAlmostRotateStopCallback([](const LEAP_HAND&) {
+	ulp.SetOnAlmostRotateStopCallback([](const int64_t timestamp, const LEAP_HAND&) {
         SetMouseActive(true);
     });
 
 	if (config.GetRightClickActive())
 	{
-		ulp.SetOnRotateStartCallback([&config](const LEAP_HAND &)
+		ulp.SetOnRotateStartCallback([&config](const int64_t timestamp, const LEAP_HAND &)
 									 {
 			// printf("Rotate started\n");
 		SecondaryDown(); });
-		ulp.SetOnRotateStopCallback([](const LEAP_HAND &)
+		ulp.SetOnRotateStopCallback([](const int64_t timestamp, const LEAP_HAND &)
 									{
 			// printf("Rotate stopped\n");
 		SecondaryUp(); });
@@ -240,9 +260,10 @@ int main(int argc, char** argv)
 
 	if (config.GetScrollingActive())
 	{
-		ulp.SetOnVStartCallback([](const LEAP_HAND &)
-								{ SetScrolling(true); });
-		ulp.SetOnVContinueCallback([&config](const LEAP_HAND &h)
+		ulp.SetOnVStartCallback([](const int64_t timestamp, const LEAP_HAND &) {
+			SetScrolling(true);
+		});
+		ulp.SetOnVContinueCallback([&config](const int64_t timestamp, const LEAP_HAND &h)
 								   {
 									float palmToFingertipDist = h.middle.distal.next_joint.y - h.palm.position.y;
 
@@ -256,7 +277,7 @@ int main(int argc, char** argv)
 									{
 										VerticalScroll(static_cast<int>(-move));
 									} });
-		ulp.SetOnVStopCallback([](const LEAP_HAND &)
+		ulp.SetOnVStopCallback([](const int64_t timestamp, const LEAP_HAND &)
 							   { SetScrolling(false); });
 	}
 

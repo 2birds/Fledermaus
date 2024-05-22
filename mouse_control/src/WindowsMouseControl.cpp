@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <WinUser.h>
 #include "MouseControl.h"
 
 bool MoveMouse(int x, int y)
@@ -17,6 +18,22 @@ bool MoveMouse(int x, int y)
 		return true;
 	}
 	return false;
+}
+
+bool SetMouse(int x, int y)
+{
+	SetCursorPos(x, y);
+	return true;
+}
+
+int GetScreenWidth()
+{
+	return GetSystemMetrics(SM_CXSCREEN);
+}
+
+int GetScreenHeight()
+{
+	return GetSystemMetrics(SM_CYSCREEN);
 }
 
 bool IssueClick(DWORD flags)
@@ -67,22 +84,22 @@ bool SecondaryClick()
 
 bool MiddleClick()
 {
-        return IssueClick(MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_MIDDLEUP);
+    return IssueClick(MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_MIDDLEUP);
 }
 
 bool MiddleDown()
 {
-        return IssueClick(MOUSEEVENTF_MIDDLEDOWN);
+    return IssueClick(MOUSEEVENTF_MIDDLEDOWN);
 }
 
 bool MiddleUp()
 {
-        return IssueClick(MOUSEEVENTF_MIDDLEUP);
+    return IssueClick(MOUSEEVENTF_MIDDLEUP);
 }
 
 bool VerticalScroll(int wheelAmt)
 {
-        DWORD amt = static_cast<DWORD>(wheelAmt);
+    DWORD amt = static_cast<DWORD>(wheelAmt);
 	INPUT input;
 	input.type = INPUT_MOUSE;
 	input.mi.time = 0;
