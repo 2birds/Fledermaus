@@ -68,7 +68,7 @@ class UltraleapPoller
         const float middlePinchThreshold_ =  35.f;
         const float ringPinchThreshold_   =  25.f;
         const float pinkyPinchThreshold_  =  35.f;
-        const float fistThreshold_ =  0.9f;
+        const float fistThreshold_ =  0.5f;
         const float rotationThreshold_ = 20.f;
 
         position_callback_t positionCallback_;

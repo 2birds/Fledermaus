@@ -164,14 +164,14 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 					if (!doingFist_) // A fist is also detected as a pinch, but not the other way round
 					{
 					    PinchChecks(timestamp, &hand);
+						IndexPinchChecks(timestamp, &hand);
+						MiddlePinchChecks(timestamp, &hand);
+						RingPinchChecks(timestamp, &hand);
+						PinkyPinchChecks(timestamp, &hand);
+						VChecks(timestamp, &hand);
+						AlmostRotateChecks(timestamp, &hand);
+						RotateChecks(timestamp, &hand);
 					}
-					IndexPinchChecks(timestamp, &hand);
-					MiddlePinchChecks(timestamp, &hand);
-					RingPinchChecks(timestamp, &hand);
-					PinkyPinchChecks(timestamp, &hand);
-					VChecks(timestamp, &hand);
-					AlmostRotateChecks(timestamp, &hand);
-					RotateChecks(timestamp, &hand);
 				}
 			}
 			else
