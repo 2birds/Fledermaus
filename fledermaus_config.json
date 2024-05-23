@@ -7,5 +7,10 @@
     "ScrollingSpeed" : 4.0,
     "ScrollThreshold" : 20.0,
     "VerticalOrientation" : true,
-    "IndexPinchThreshold" : 35.0
+    "IndexPinchThreshold" : 35.0,
+    "UseAbsoluteMousePosition" : false,
+    "BoundsLeftMeters" : -0.25,
+    "BoundsRightMeters" : 0.25,
+    "BoundsLowerMeters" : 0.10,
+    "BoundsUpperMeters" : 0.35
 }

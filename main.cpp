@@ -8,6 +8,7 @@
 
 #define SECONDS_TO_MICROSECONDS(seconds) seconds * 1000000
 #define METERS_TO_MILLIMETERS(meters) meters * 1000
+#define MILLIMETERS_TO_METERS(millimeteres) millimeteres * 0.001
 
 bool MouseActive = true;
 bool Scrolling = false;
@@ -21,6 +22,22 @@ LEAP_VECTOR PrevPos = {0, 0, 0};
 
 const float FIST_RECENTER_HOLD_TIME_SECONDS = 1.0f;
 const float FIST_RECENTER_DEADZONE_DISTANCE_METERS = 0.03f;
+
+float lerp(float a, float b, float t)
+{
+	return (1.0f - t) * a + b * t;
+}
+
+float inverse_lerp(float a, float b, float v)
+{
+	return (v - a) / (b - a);
+}
+
+float remap(float iMin, float iMax, float oMin, float oMax, float v)
+{
+	float t = inverse_lerp(iMin, iMax, v);
+	return lerp(oMin, oMax, t);
+}
 
 void SetMouseActive(bool active)
 {
@@ -341,9 +358,31 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-					MoveMouse(xMove, static_cast<int>(config.GetSpeed()* yMove));
+				if (config.GetUseAbsoluteMousePosition())
+				{
+					int w = GetScreenWidth();
+					int h = GetScreenHeight();
+
+					float boundsLower = config.GetBoundsLowerMeters();
+					float boundsUpper = config.GetBoundsUpperMeters();
+					float boundsLeft = config.GetBoundsLeftMeters();
+					float boundsRight = config.GetBoundsRightMeters();
+
+					int mouseX = remap(boundsLeft, boundsRight, 0, w, MILLIMETERS_TO_METERS(v.x));
+					int mouseY = remap(boundsLower, boundsUpper, h, 0, MILLIMETERS_TO_METERS(v.y));
+
+					//printf("W: %f pos vs %i/%i pixels\n", MILLIMETERS_TO_METERS(v.x), mouseX, w);
+					//printf("H: %f pos vs %i/%i pixels\n\n", MILLIMETERS_TO_METERS(v.y), mouseY, h);
+
+					SetMouse(mouseX, mouseY);
+				}
+				else
+				{
+					MoveMouse(xMove, static_cast<int>(config.GetSpeed() * yMove));
+				}
 			}
 		}
+
 		PrevPos = v;
 	});
 	

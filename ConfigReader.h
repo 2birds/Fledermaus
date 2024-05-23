@@ -16,6 +16,11 @@
 #define SCROLL_THRESHOLD_NAME ScrollThreshold
 #define ORIENTATION_NAME VerticalOrientation
 #define INDEX_PINCH_THRESHOLD_NAME IndexPinchThreshold
+#define USE_ABSOLUTE_MOUSE_POSITION UseAbsoluteMousePosition
+#define BOUNDS_LEFT_NAME BoundsLeftMeters
+#define BOUNDS_RIGHT_NAME BoundsRightMeters
+#define BOUNDS_LOWER_NAME BoundsLowerMeters
+#define BOUNDS_UPPER_NAME BoundsUpperMeters
 
 #define STRINGIFY(x) #x
 #define STRINGIFY_HELPER(x) STRINGIFY(x)
@@ -60,6 +65,11 @@ class ConfigReader {
     SETTERS_AND_GETTERS_BOOL(RIGHT_CLICK_ACTIVE_NAME, true);
     SETTERS_AND_GETTERS_BOOL(FIST_TO_LIFT_NAME, true);
     SETTERS_AND_GETTERS_FLOAT(INDEX_PINCH_THRESHOLD_NAME, 35.0f);
+    SETTERS_AND_GETTERS_BOOL(USE_ABSOLUTE_MOUSE_POSITION, false);
+    SETTERS_AND_GETTERS_FLOAT(BOUNDS_LEFT_NAME, -0.25f);
+    SETTERS_AND_GETTERS_FLOAT(BOUNDS_RIGHT_NAME, 0.25f);
+    SETTERS_AND_GETTERS_FLOAT(BOUNDS_LOWER_NAME, 0.10f);
+    SETTERS_AND_GETTERS_FLOAT(BOUNDS_UPPER_NAME, 0.35f);
 
     private:
     std::string config_file_name_;
@@ -106,6 +116,11 @@ class ConfigReader {
         printf( STRINGIFY_HELPER(SCROLL_THRESHOLD_NAME) ": %f\n", TOKENPASTE(SCROLL_THRESHOLD_NAME, _));
         printf( STRINGIFY_HELPER(ORIENTATION_NAME) ": %s\n", TOKENPASTE(ORIENTATION_NAME, _) ? "true" : "false");
         printf( STRINGIFY_HELPER(INDEX_PINCH_THRESHOLD_NAME) ": %f\n", TOKENPASTE(INDEX_PINCH_THRESHOLD_NAME, _));
+        printf( STRINGIFY_HELPER(USE_ABSOLUTE_MOUSE_POSITION) ": %s\n", TOKENPASTE(USE_ABSOLUTE_MOUSE_POSITION, _) ? "true" : "false");
+        printf( STRINGIFY_HELPER(BOUNDS_LEFT_NAME) ": %f\n", TOKENPASTE(BOUNDS_LEFT_NAME, _));
+        printf( STRINGIFY_HELPER(BOUNDS_RIGHT_NAME) ": %f\n", TOKENPASTE(BOUNDS_RIGHT_NAME, _));
+        printf( STRINGIFY_HELPER(BOUNDS_LOWER_NAME) ": %f\n", TOKENPASTE(BOUNDS_LOWER_NAME, _));
+        printf( STRINGIFY_HELPER(BOUNDS_UPPER_NAME) ": %f\n", TOKENPASTE(BOUNDS_UPPER_NAME, _));
     }
 
     private:
@@ -200,6 +215,56 @@ class ConfigReader {
         else
         {
             printf(STRINGIFY_HELPER(INDEX_PINCH_THRESHOLD_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(USE_ABSOLUTE_MOUSE_POSITION)))
+        {
+            // assert(d_[STRINGIFY(USE_ABSOLUTE_MOUSE_POSITION)].IsBool());
+            TOKENPASTE(USE_ABSOLUTE_MOUSE_POSITION, _) = d_[STRINGIFY_HELPER(USE_ABSOLUTE_MOUSE_POSITION)].GetBool();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(USE_ABSOLUTE_MOUSE_POSITION) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(BOUNDS_LEFT_NAME)))
+        {
+            // assert(d_[STRINGIFY(BOUNDS_WIDTH_LEFT_NAME)].IsFloat());
+            TOKENPASTE(BOUNDS_LEFT_NAME, _) = d_[STRINGIFY_HELPER(BOUNDS_LEFT_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(BOUNDS_LEFT_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(BOUNDS_RIGHT_NAME)))
+        {
+            // assert(d_[STRINGIFY(BOUNDS_WIDTH_RIGHT_NAME)].IsFloat());
+            TOKENPASTE(BOUNDS_RIGHT_NAME, _) = d_[STRINGIFY_HELPER(BOUNDS_RIGHT_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(BOUNDS_RIGHT_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(BOUNDS_LOWER_NAME)))
+        {
+            // assert(d_[STRINGIFY(BOUNDS_HEIGHT_LOWER_NAME)].IsFloat());
+            TOKENPASTE(BOUNDS_LOWER_NAME, _) = d_[STRINGIFY_HELPER(BOUNDS_LOWER_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(BOUNDS_LOWER_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(BOUNDS_UPPER_NAME)))
+        {
+            // assert(d_[STRINGIFY(BOUNDS_HEIGHT_UPPER_NAME)].IsFloat());
+            TOKENPASTE(BOUNDS_UPPER_NAME, _) = d_[STRINGIFY_HELPER(BOUNDS_UPPER_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(BOUNDS_UPPER_NAME) " not found!\n");
         }
     }
 };
