@@ -21,6 +21,9 @@
 #define BOUNDS_RIGHT_NAME BoundsRightMeters
 #define BOUNDS_LOWER_NAME BoundsLowerMeters
 #define BOUNDS_UPPER_NAME BoundsUpperMeters
+#define BOUNDS_NEAR_NAME BoundsNearMeters
+#define BOUNDS_FAR_NAME BoundsFarMeters
+#define LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME LimitTrackingToWithinBounds
 
 #define STRINGIFY(x) #x
 #define STRINGIFY_HELPER(x) STRINGIFY(x)
@@ -65,11 +68,14 @@ class ConfigReader {
     SETTERS_AND_GETTERS_BOOL(RIGHT_CLICK_ACTIVE_NAME, true);
     SETTERS_AND_GETTERS_BOOL(FIST_TO_LIFT_NAME, true);
     SETTERS_AND_GETTERS_FLOAT(INDEX_PINCH_THRESHOLD_NAME, 35.0f);
-    SETTERS_AND_GETTERS_BOOL(USE_ABSOLUTE_MOUSE_POSITION, false);
-    SETTERS_AND_GETTERS_FLOAT(BOUNDS_LEFT_NAME, -0.25f);
+    SETTERS_AND_GETTERS_BOOL(USE_ABSOLUTE_MOUSE_POSITION, true);
+    SETTERS_AND_GETTERS_FLOAT(BOUNDS_LEFT_NAME, 0.25f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_RIGHT_NAME, 0.25f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_LOWER_NAME, 0.10f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_UPPER_NAME, 0.35f);
+    SETTERS_AND_GETTERS_FLOAT(BOUNDS_NEAR_NAME, 0.15f);
+    SETTERS_AND_GETTERS_FLOAT(BOUNDS_FAR_NAME, 0.15f);
+    SETTERS_AND_GETTERS_BOOL(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, true)
 
     private:
     std::string config_file_name_;
@@ -121,6 +127,9 @@ class ConfigReader {
         printf( STRINGIFY_HELPER(BOUNDS_RIGHT_NAME) ": %f\n", TOKENPASTE(BOUNDS_RIGHT_NAME, _));
         printf( STRINGIFY_HELPER(BOUNDS_LOWER_NAME) ": %f\n", TOKENPASTE(BOUNDS_LOWER_NAME, _));
         printf( STRINGIFY_HELPER(BOUNDS_UPPER_NAME) ": %f\n", TOKENPASTE(BOUNDS_UPPER_NAME, _));
+        printf( STRINGIFY_HELPER(BOUNDS_NEAR_NAME) ": %f\n", TOKENPASTE(BOUNDS_NEAR_NAME, _));
+        printf( STRINGIFY_HELPER(BOUNDS_FAR_NAME) ": %f\n", TOKENPASTE(BOUNDS_FAR_NAME, _));
+        printf( STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME) ": %s\n", TOKENPASTE(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, _) ? "true" : "false");
     }
 
     private:
@@ -265,6 +274,36 @@ class ConfigReader {
         else
         {
             printf(STRINGIFY_HELPER(BOUNDS_UPPER_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(BOUNDS_NEAR_NAME)))
+        {
+            // assert(d_[STRINGIFY(BOUNDS_NEAR_NAME)].IsFloat());
+            TOKENPASTE(BOUNDS_NEAR_NAME, _) = d_[STRINGIFY_HELPER(BOUNDS_NEAR_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(BOUNDS_NEAR_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(BOUNDS_FAR_NAME)))
+        {
+            // assert(d_[STRINGIFY(BOUNDS_FAR_NAME)].IsFloat());
+            TOKENPASTE(BOUNDS_FAR_NAME, _) = d_[STRINGIFY_HELPER(BOUNDS_FAR_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(BOUNDS_FAR_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME)))
+        {
+            // assert(d_[STRINGIFY(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME)].IsBool());
+            TOKENPASTE(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, _) = d_[STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME)].GetBool();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME) " not found!\n");
         }
     }
 };

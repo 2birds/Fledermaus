@@ -227,7 +227,14 @@ int main(int argc, char** argv)
 	printf("Setting up..\n");
 	UltraleapPoller ulp;
 
-	ulp.indexPinchThreshold_ = config.GetIndexPinchThreshold();
+	ulp.indexPinchThreshold = config.GetIndexPinchThreshold();
+	ulp.boundsLeftM = config.GetBoundsLeftMeters();
+	ulp.boundsRightM = config.GetBoundsRightMeters();
+	ulp.boundsLowerM = config.GetBoundsLowerMeters();
+	ulp.boundsUpperM = config.GetBoundsUpperMeters();
+	ulp.boundsNearM = config.GetBoundsNearMeters();
+	ulp.boundsFarM = config.GetBoundsFarMeters();
+	ulp.limitTrackingToWithinBounds = config.GetLimitTrackingToWithinBounds();
 
 	if (config.GetFistToLiftActive())
 	{
@@ -368,7 +375,7 @@ int main(int argc, char** argv)
 					float boundsLeft = config.GetBoundsLeftMeters();
 					float boundsRight = config.GetBoundsRightMeters();
 
-					int mouseX = remap(boundsLeft, boundsRight, 0, w, MILLIMETERS_TO_METERS(v.x));
+					int mouseX = remap(-boundsLeft, boundsRight, 0, w, MILLIMETERS_TO_METERS(v.x));
 					int mouseY = remap(boundsLower, boundsUpper, h, 0, MILLIMETERS_TO_METERS(v.y));
 
 					//printf("W: %f pos vs %i/%i pixels\n", MILLIMETERS_TO_METERS(v.x), mouseX, w);

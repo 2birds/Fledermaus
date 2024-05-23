@@ -150,6 +150,15 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 				}
 				else
 				{
+					//printf("x=%f, y=%f, z=%f\n", hand.palm.position.x, hand.palm.position.y, hand.palm.position.z);
+					if (limitTrackingToWithinBounds
+						&& hand.palm.position.x * 0.001f < -boundsLeftM || hand.palm.position.x * 0.001f > boundsRightM
+						|| hand.palm.position.y * 0.001f < -boundsLowerM || hand.palm.position.y * 0.001f > boundsUpperM
+						|| hand.palm.position.z * 0.001f > boundsNearM || hand.palm.position.z * 0.001f < -boundsFarM)
+					{
+						continue;
+					}
+
 					// Do hand stuff.
 					if (positionCallback_)
 					{
@@ -331,10 +340,10 @@ bool UltraleapPoller::isPinch(const LEAP_HAND* hand) const
 
 bool UltraleapPoller::isIndexPinch(const LEAP_HAND* hand) const
 {
-	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  < indexPinchThreshold_ &&
-	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > indexPinchThreshold_ &&
-	       distance(hand->ring.distal.next_joint, hand->thumb.distal.next_joint)   > indexPinchThreshold_ &&
-	       distance(hand->pinky.distal.next_joint, hand->thumb.distal.next_joint)  > indexPinchThreshold_;
+	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  < indexPinchThreshold &&
+	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > indexPinchThreshold &&
+	       distance(hand->ring.distal.next_joint, hand->thumb.distal.next_joint)   > indexPinchThreshold &&
+	       distance(hand->pinky.distal.next_joint, hand->thumb.distal.next_joint)  > indexPinchThreshold;
 }
 
 

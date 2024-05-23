@@ -23,7 +23,9 @@ class UltraleapPoller
 
         float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
 
-        float indexPinchThreshold_ = 35.f;
+        float indexPinchThreshold;
+        float boundsLeftM, boundsRightM, boundsLowerM, boundsUpperM, boundsNearM, boundsFarM;
+        bool limitTrackingToWithinBounds;
 
 // This macro sets up all callback setters and getters, tests, and flags related to a particular gesture..
 // EXCEPT the functions and values actually responsible for detecting the gesture.
