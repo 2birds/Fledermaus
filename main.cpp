@@ -17,11 +17,15 @@ int64_t PrevFistTimestamp;
 int64_t FistStartTimestamp;
 LEAP_VECTOR FistStartPosition;
 bool CancelFistRecentering = false;
+const float FIST_RECENTER_HOLD_TIME_SECONDS = 1.0f;
+const float FIST_RECENTER_DEADZONE_DISTANCE_METERS = 0.03f;
+
+bool CursorDeadzoneEnabled;
+LEAP_VECTOR CursorDeadzoneStartPosition;
+const float CURSOR_DEADZONE_THRESHOLD_METERS = 0.03f;
 
 LEAP_VECTOR PrevPos = {0, 0, 0};
 
-const float FIST_RECENTER_HOLD_TIME_SECONDS = 1.0f;
-const float FIST_RECENTER_DEADZONE_DISTANCE_METERS = 0.03f;
 
 float lerp(float a, float b, float t)
 {
@@ -297,11 +301,14 @@ int main(int argc, char** argv)
 	// ulp.SetOnAlmostPinchStopCallback([](const LEAP_HAND&) {
 	// 	SetMouseActive(true);
 	// 	});
-	ulp.SetOnIndexPinchStartCallback([](const int64_t timestamp, const LEAP_HAND&) {
+	ulp.SetOnIndexPinchStartCallback([](const int64_t timestamp, const LEAP_HAND &hand) {
 		PrimaryDown();
+		CursorDeadzoneStartPosition = hand.palm.position;
+		CursorDeadzoneEnabled = true;
 	});
 	ulp.SetOnIndexPinchStopCallback([](const int64_t timestamp, const LEAP_HAND&) {
 		PrimaryUp();
+		CursorDeadzoneEnabled = false;
 	});
 	ulp.SetOnAlmostRotateStartCallback([](const int64_t timestamp, const LEAP_HAND&) {
         SetMouseActive(false);
@@ -350,13 +357,23 @@ int main(int argc, char** argv)
 		});
 	}
 
-	ulp.SetPositionCallback([&config](LEAP_VECTOR v) {
+	ulp.SetPositionCallback([&ulp, &config](LEAP_VECTOR v) {
 		if ((PrevPos.x == 0 && PrevPos.y == 0 && PrevPos.z == 0) || !MouseActive)
 		{
 			// We want to do relative updates so skip this one so we have sensible numbers
 		}
 		else
 		{
+			if (CursorDeadzoneEnabled)
+			{
+				float deadzoneDistance = ulp.distance(CursorDeadzoneStartPosition, v);
+				if (deadzoneDistance > METERS_TO_MILLIMETERS(CURSOR_DEADZONE_THRESHOLD_METERS))
+				{
+					CursorDeadzoneEnabled = false;
+				}
+				return;
+			}
+
 			int xMove = static_cast<int>(config.GetSpeed() * (v.x - PrevPos.x));
 			float yMove = (v.y - PrevPos.y) * (config.GetVerticalOrientation() ? -1 : 1);
 
