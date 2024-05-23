@@ -301,47 +301,50 @@ int main(int argc, char** argv)
 		ulp.SetOnVStartCallback([](const int64_t timestamp, const LEAP_HAND &) {
 			SetScrolling(true);
 		});
-		ulp.SetOnVContinueCallback([&config](const int64_t timestamp, const LEAP_HAND &h)
-								   {
-									float palmToFingertipDist = h.middle.distal.next_joint.y - h.palm.position.y;
+		ulp.SetOnVContinueCallback(
+			[&config](const int64_t timestamp, const LEAP_HAND &h)
+			{
+				float palmToFingertipDist = h.middle.distal.next_joint.y - h.palm.position.y;
 
 				float move = config.GetScrollingSpeed();
 				float threshold = config.GetScrollThreshold();
 
-									if (palmToFingertipDist > 20.f)
-									{
-										VerticalScroll(static_cast<int>(move));
-									}
-									else if (palmToFingertipDist < -20.f)
-									{
-										VerticalScroll(static_cast<int>(-move));
-									} });
-		ulp.SetOnVStopCallback([](const int64_t timestamp, const LEAP_HAND &)
-							   { SetScrolling(false); });
+				if (palmToFingertipDist > threshold)
+				{
+					VerticalScroll(static_cast<int>(move));
+				}
+				else if (palmToFingertipDist < -threshold)
+				{
+					VerticalScroll(static_cast<int>(-move));
+				}
+			}
+		);
+		ulp.SetOnVStopCallback([](const int64_t timestamp, const LEAP_HAND &) {
+			SetScrolling(false);
+		});
 	}
 
-	ulp.SetPositionCallback([&config](LEAP_VECTOR v){ 
+	ulp.SetPositionCallback([&config](LEAP_VECTOR v) {
 		if ((PrevPos.x == 0 && PrevPos.y == 0 && PrevPos.z == 0) || !MouseActive)
 		{
-		    // We want to do relative updates so skip this one so we have sensible numbers
+			// We want to do relative updates so skip this one so we have sensible numbers
 		}
-        else
-        {
-
+		else
+		{
 			int xMove = static_cast<int>(config.GetSpeed() * (v.x - PrevPos.x));
 			float yMove = (v.y - PrevPos.y) * (config.GetVerticalOrientation() ? -1 : 1);
 
-		    // if (config.GetUseScrolling() && Scrolling)
-		    if (Scrolling && config.GetLockMouseOnScroll())
+			// if (config.GetUseScrolling() && Scrolling)
+			if (Scrolling && config.GetLockMouseOnScroll())
 			{
-		            // VerticalScroll(static_cast<int>(config.GetScrollingSpeed() * yMove));	     
+				// VerticalScroll(static_cast<int>(config.GetScrollingSpeed() * yMove));
 			}
 			else
 			{
 					MoveMouse(xMove, static_cast<int>(config.GetSpeed()* yMove));
 			}
 		}
-		PrevPos = v;    
+		PrevPos = v;
 	});
 	
 	ulp.StartPoller();
