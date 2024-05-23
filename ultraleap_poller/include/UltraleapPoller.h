@@ -23,6 +23,8 @@ class UltraleapPoller
 
         float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
 
+        float indexPinchThreshold_ = 35.f;
+
 // This macro sets up all callback setters and getters, tests, and flags related to a particular gesture..
 // EXCEPT the functions and values actually responsible for detecting the gesture.
 #define AddGestureCallbackSetters(name) \
@@ -64,7 +66,6 @@ class UltraleapPoller
     private:
         bool pollerRunning_ = false;
         const float pinchThreshold_ =  0.85f;
-        const float indexPinchThreshold_  =  35.f;
         const float middlePinchThreshold_ =  35.f;
         const float ringPinchThreshold_   =  25.f;
         const float pinkyPinchThreshold_  =  35.f;

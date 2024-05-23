@@ -207,8 +207,10 @@ int main(int argc, char** argv)
 
     config.print();
 
-	printf("Setting up..");
+	printf("Setting up..\n");
 	UltraleapPoller ulp;
+
+	ulp.indexPinchThreshold_ = config.GetIndexPinchThreshold();
 
 	if (config.GetFistToLiftActive())
 	{
@@ -303,7 +305,8 @@ int main(int argc, char** argv)
 								   {
 									float palmToFingertipDist = h.middle.distal.next_joint.y - h.palm.position.y;
 
-									float move = config.GetScrollingSpeed() * 2;
+				float move = config.GetScrollingSpeed();
+				float threshold = config.GetScrollThreshold();
 
 									if (palmToFingertipDist > 20.f)
 									{

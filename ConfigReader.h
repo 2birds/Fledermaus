@@ -13,7 +13,9 @@
 #define LOCK_MOUSE_ON_SCROLL_NAME LockMouseOnScroll
 #define SCROLLING_ON_NAME ScrollingActive
 #define SCROLLING_SPEED_NAME ScrollingSpeed
+#define SCROLL_THRESHOLD_NAME ScrollThreshold
 #define ORIENTATION_NAME VerticalOrientation
+#define INDEX_PINCH_THRESHOLD_NAME IndexPinchThreshold
 
 #define STRINGIFY(x) #x
 #define STRINGIFY_HELPER(x) STRINGIFY(x)
@@ -51,11 +53,13 @@ class ConfigReader {
 
     SETTERS_AND_GETTERS_FLOAT(SPEED_NAME, 2.0f);
     SETTERS_AND_GETTERS_BOOL(SCROLLING_ON_NAME, true);
-    SETTERS_AND_GETTERS_FLOAT(SCROLLING_SPEED_NAME, 2.0f);
+    SETTERS_AND_GETTERS_FLOAT(SCROLLING_SPEED_NAME, 4.0f);
+    SETTERS_AND_GETTERS_FLOAT(SCROLL_THRESHOLD_NAME, 20.0f)
     SETTERS_AND_GETTERS_BOOL(ORIENTATION_NAME, true);
     SETTERS_AND_GETTERS_BOOL(LOCK_MOUSE_ON_SCROLL_NAME, true);
     SETTERS_AND_GETTERS_BOOL(RIGHT_CLICK_ACTIVE_NAME, true);
     SETTERS_AND_GETTERS_BOOL(FIST_TO_LIFT_NAME, true);
+    SETTERS_AND_GETTERS_FLOAT(INDEX_PINCH_THRESHOLD_NAME, 35.0f);
 
     private:
     std::string config_file_name_;
@@ -99,7 +103,9 @@ class ConfigReader {
         printf( STRINGIFY_HELPER(LOCK_MOUSE_ON_SCROLL_NAME) ": %s\n", TOKENPASTE(LOCK_MOUSE_ON_SCROLL_NAME, _) ? "true" : "false");
         printf( STRINGIFY_HELPER(SCROLLING_ON_NAME) ": %s\n", TOKENPASTE(SCROLLING_ON_NAME, _) ? "true" : "false");
         printf( STRINGIFY_HELPER(SCROLLING_SPEED_NAME) ": %f\n", TOKENPASTE(SCROLLING_SPEED_NAME, _));
+        printf( STRINGIFY_HELPER(SCROLL_THRESHOLD_NAME) ": %f\n", TOKENPASTE(SCROLL_THRESHOLD_NAME, _));
         printf( STRINGIFY_HELPER(ORIENTATION_NAME) ": %s\n", TOKENPASTE(ORIENTATION_NAME, _) ? "true" : "false");
+        printf( STRINGIFY_HELPER(INDEX_PINCH_THRESHOLD_NAME) ": %f\n", TOKENPASTE(INDEX_PINCH_THRESHOLD_NAME, _));
     }
 
     private:
@@ -174,6 +180,26 @@ class ConfigReader {
         else
         {
             printf(STRINGIFY_HELPER(SCROLLING_SPEED_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(SCROLL_THRESHOLD_NAME)))
+        {
+            // assert(d_[STRINGIFY(SCROLL_THRESHOLD_NAME)].IsFloat());
+            TOKENPASTE(SCROLL_THRESHOLD_NAME, _) = d_[STRINGIFY_HELPER(SCROLL_THRESHOLD_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(SCROLL_THRESHOLD_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(INDEX_PINCH_THRESHOLD_NAME)))
+        {
+            // assert(d_[STRINGIFY(INDEX_PINCH_THRESHOLD_NAME)].IsFloat());
+            TOKENPASTE(INDEX_PINCH_THRESHOLD_NAME, _) = d_[STRINGIFY_HELPER(INDEX_PINCH_THRESHOLD_NAME)].GetFloat();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(INDEX_PINCH_THRESHOLD_NAME) " not found!\n");
         }
     }
 };

@@ -4,6 +4,8 @@
     "RightClickActive" : true,
     "LockMouseOnScroll" : true,
     "ScrollingActive" : true,
-    "ScrollingSpeed" : 2,
-    "VerticalOrientation" : true
+    "ScrollingSpeed" : 4.0,
+    "ScrollThreshold" : 20.0,
+    "VerticalOrientation" : true,
+    "IndexPinchThreshold" : 35.0
 }
