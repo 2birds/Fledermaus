@@ -58,6 +58,17 @@ bool GetScrolling()
 	return Scrolling;
 }
 
+void EnableCursorDeadzone(LEAP_VECTOR startPosition)
+{
+	CursorDeadzoneStartPosition = startPosition;
+	CursorDeadzoneEnabled = true;
+}
+
+void DisableCursorDeadzone()
+{
+	CursorDeadzoneEnabled = false;
+}
+
 bool ParseCommandLine(ConfigReader &config, int argc, char **argv)
 {
 	for (int i = 0; i < argc; i++)
@@ -289,44 +300,37 @@ int main(int argc, char** argv)
 				}
 			}
 		);
-		ulp.SetOnFistStopCallback([](const int64_t timestamp, const LEAP_HAND &)
-								  { SetMouseActive(true); });
+		ulp.SetOnFistStopCallback([](const int64_t timestamp, const LEAP_HAND &) {
+			SetMouseActive(true);
+		});
 	}
-	
-	// The following interferes with fist.
-	// The AlmostPinchStop callback fires 
-	// ulp.SetOnAlmostPinchStartCallback([](const LEAP_HAND&) { 
-	// 	SetMouseActive(false);
-	// 	});
-	// ulp.SetOnAlmostPinchStopCallback([](const LEAP_HAND&) {
-	// 	SetMouseActive(true);
-	// 	});
+
 	ulp.SetOnIndexPinchStartCallback([](const int64_t timestamp, const LEAP_HAND &hand) {
 		PrimaryDown();
-		CursorDeadzoneStartPosition = hand.palm.position;
-		CursorDeadzoneEnabled = true;
+		EnableCursorDeadzone(hand.palm.position);
 	});
 	ulp.SetOnIndexPinchStopCallback([](const int64_t timestamp, const LEAP_HAND&) {
 		PrimaryUp();
-		CursorDeadzoneEnabled = false;
+		DisableCursorDeadzone();
 	});
-	ulp.SetOnAlmostRotateStartCallback([](const int64_t timestamp, const LEAP_HAND&) {
-        SetMouseActive(false);
+
+	ulp.SetOnAlmostRotateStartCallback([](const int64_t timestamp, const LEAP_HAND &hand) {
+		EnableCursorDeadzone(hand.palm.position);
     });
 	ulp.SetOnAlmostRotateStopCallback([](const int64_t timestamp, const LEAP_HAND&) {
-        SetMouseActive(true);
+		// Not used
     });
 
 	if (config.GetRightClickActive())
 	{
-		ulp.SetOnRotateStartCallback([&config](const int64_t timestamp, const LEAP_HAND &)
-									 {
-			// printf("Rotate started\n");
-		SecondaryDown(); });
-		ulp.SetOnRotateStopCallback([](const int64_t timestamp, const LEAP_HAND &)
-									{
-			// printf("Rotate stopped\n");
-		SecondaryUp(); });
+		ulp.SetOnRotateStartCallback([&config](const int64_t timestamp, const LEAP_HAND &hand) {
+			SecondaryDown();
+			EnableCursorDeadzone(hand.palm.position);
+		});
+		ulp.SetOnRotateStopCallback([](const int64_t timestamp, const LEAP_HAND &) {
+			SecondaryUp();
+			DisableCursorDeadzone();
+		});
 	}
 
 	if (config.GetScrollingActive())
@@ -369,7 +373,7 @@ int main(int argc, char** argv)
 				float deadzoneDistance = ulp.distance(CursorDeadzoneStartPosition, v);
 				if (deadzoneDistance > METERS_TO_MILLIMETERS(CURSOR_DEADZONE_THRESHOLD_METERS))
 				{
-					CursorDeadzoneEnabled = false;
+					DisableCursorDeadzone();
 				}
 				return;
 			}
