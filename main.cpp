@@ -298,9 +298,11 @@ int main(int argc, char** argv)
 	// 	SetMouseActive(true);
 	// 	});
 	ulp.SetOnIndexPinchStartCallback([](const int64_t timestamp, const LEAP_HAND&) {
-		PrimaryDown(); });
+		PrimaryDown();
+	});
 	ulp.SetOnIndexPinchStopCallback([](const int64_t timestamp, const LEAP_HAND&) {
-		PrimaryUp(); });
+		PrimaryUp();
+	});
 	ulp.SetOnAlmostRotateStartCallback([](const int64_t timestamp, const LEAP_HAND&) {
         SetMouseActive(false);
     });

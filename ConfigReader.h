@@ -75,7 +75,7 @@ class ConfigReader {
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_UPPER_NAME, 0.35f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_NEAR_NAME, 0.15f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_FAR_NAME, 0.15f);
-    SETTERS_AND_GETTERS_BOOL(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, true)
+    SETTERS_AND_GETTERS_BOOL(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, false)
 
     private:
     std::string config_file_name_;
@@ -138,7 +138,6 @@ class ConfigReader {
         if (d_.HasMember(STRINGIFY_HELPER(ORIENTATION_NAME )))
         {
             // assert(d_[STRINGIFY_HELPER(ORIENTATION_NAME)].IsString());
-
             TOKENPASTE(ORIENTATION_NAME, _) = d_[STRINGIFY_HELPER(ORIENTATION_NAME)].GetBool();
         }
         else
