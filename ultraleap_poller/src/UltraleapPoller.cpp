@@ -150,26 +150,39 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 				}
 				else
 				{
+					//printf("x=%f, y=%f, z=%f\n", hand.palm.position.x, hand.palm.position.y, hand.palm.position.z);
+					if (limitTrackingToWithinBounds)
+					{
+						if (hand.palm.position.x * 0.001f < -boundsLeftM || hand.palm.position.x * 0.001f > boundsRightM
+							|| hand.palm.position.y * 0.001f < -boundsLowerM || hand.palm.position.y * 0.001f > boundsUpperM
+							|| hand.palm.position.z * 0.001f > boundsNearM || hand.palm.position.z * 0.001f < -boundsFarM)
+						{
+							continue;
+						}
+					}
+
 					// Do hand stuff.
 					if (positionCallback_)
 					{
 						positionCallback_(hand.palm.position);
 					}
 					
+					int64_t timestamp = tracking_event->info.timestamp;
+
 					// The following need to be added manually, the macro can't do it
-					AlmostPinchChecks(&hand);
-					FistChecks(&hand);
+					AlmostPinchChecks(timestamp, &hand);
+					FistChecks(timestamp, &hand);
 					if (!doingFist_) // A fist is also detected as a pinch, but not the other way round
 					{
-					    PinchChecks(&hand);
+					    PinchChecks(timestamp, &hand);
+						IndexPinchChecks(timestamp, &hand);
+						MiddlePinchChecks(timestamp, &hand);
+						RingPinchChecks(timestamp, &hand);
+						PinkyPinchChecks(timestamp, &hand);
+						VChecks(timestamp, &hand);
+						AlmostRotateChecks(timestamp, &hand);
+						RotateChecks(timestamp, &hand);
 					}
-					IndexPinchChecks(&hand);
-					MiddlePinchChecks(&hand);
-					RingPinchChecks(&hand);
-					PinkyPinchChecks(&hand);
-					VChecks(&hand);
-					AlmostRotateChecks(&hand);
-					RotateChecks(&hand);
 				}
 			}
 			else
@@ -240,7 +253,7 @@ void UltraleapPoller::ClearOn##name##StopCallback() \
 { \
 	name##StopCallback_ = nullptr; \
 } \
-void UltraleapPoller::name##Checks(const LEAP_HAND* hand) \
+void UltraleapPoller::name##Checks(const int64_t timestamp, const LEAP_HAND* hand) \
 { \
   if (is##name##(hand)) \
   { \
@@ -248,14 +261,14 @@ void UltraleapPoller::name##Checks(const LEAP_HAND* hand) \
 		{ \
 			if (name##ContinueCallback_) \
 			{ \
-				name##ContinueCallback_(*hand); \
+				name##ContinueCallback_(timestamp, *hand); \
 			} \
 		} \
 		else \
 		{ \
 			if (name##StartCallback_) \
 			{ \
-				name##StartCallback_(*hand); \
+				name##StartCallback_(timestamp, *hand); \
 			} \
 			doing##name##_ = true; \
 		} \
@@ -266,7 +279,7 @@ void UltraleapPoller::name##Checks(const LEAP_HAND* hand) \
 		{ \
 			if (name##StopCallback_) \
 			{ \
-				name##StopCallback_(*hand); \
+				name##StopCallback_(timestamp, *hand); \
 			} \
 			doing##name##_ = false; \
 		} \
@@ -329,10 +342,10 @@ bool UltraleapPoller::isPinch(const LEAP_HAND* hand) const
 
 bool UltraleapPoller::isIndexPinch(const LEAP_HAND* hand) const
 {
-	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  < indexPinchThreshold_ &&
-	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > indexPinchThreshold_ &&
-	       distance(hand->ring.distal.next_joint, hand->thumb.distal.next_joint)   > indexPinchThreshold_ &&
-	       distance(hand->pinky.distal.next_joint, hand->thumb.distal.next_joint)  > indexPinchThreshold_;
+	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  < indexPinchThreshold &&
+	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > indexPinchThreshold &&
+	       distance(hand->ring.distal.next_joint, hand->thumb.distal.next_joint)   > indexPinchThreshold &&
+	       distance(hand->pinky.distal.next_joint, hand->thumb.distal.next_joint)  > indexPinchThreshold;
 }
 
 

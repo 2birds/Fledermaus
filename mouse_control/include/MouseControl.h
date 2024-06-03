@@ -2,6 +2,10 @@
 
 // Move the mouse to specific coordinates on the screen
 bool MoveMouse(int x, int y);
+bool SetMouse(int x, int y);
+
+int GetScreenWidth();
+int GetScreenHeight();
 
 bool PrimaryDown();
 bool PrimaryUp();

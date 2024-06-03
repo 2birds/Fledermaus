@@ -6,10 +6,42 @@
 #include "MouseControl.h"
 #include "UltraleapPoller.h"
 
+#define SECONDS_TO_MICROSECONDS(seconds) seconds * 1000000
+#define METERS_TO_MILLIMETERS(meters) meters * 1000
+#define MILLIMETERS_TO_METERS(millimeteres) millimeteres * 0.001
+
 bool MouseActive = true;
 bool Scrolling = false;
 
+int64_t PrevFistTimestamp;
+int64_t FistStartTimestamp;
+LEAP_VECTOR FistStartPosition;
+bool CancelFistRecentering = false;
+const float FIST_RECENTER_HOLD_TIME_SECONDS = 1.0f;
+const float FIST_RECENTER_DEADZONE_DISTANCE_METERS = 0.03f;
+
+bool CursorDeadzoneEnabled;
+LEAP_VECTOR CursorDeadzoneStartPosition;
+const float CURSOR_DEADZONE_THRESHOLD_METERS = 0.03f;
+
 LEAP_VECTOR PrevPos = {0, 0, 0};
+
+
+float lerp(float a, float b, float t)
+{
+	return (1.0f - t) * a + b * t;
+}
+
+float inverse_lerp(float a, float b, float v)
+{
+	return (v - a) / (b - a);
+}
+
+float remap(float iMin, float iMax, float oMin, float oMax, float v)
+{
+	float t = inverse_lerp(iMin, iMax, v);
+	return lerp(oMin, oMax, t);
+}
 
 void SetMouseActive(bool active)
 {
@@ -24,6 +56,17 @@ void SetScrolling(bool scrolling)
 bool GetScrolling()
 {
 	return Scrolling;
+}
+
+void EnableCursorDeadzone(LEAP_VECTOR startPosition)
+{
+	CursorDeadzoneStartPosition = startPosition;
+	CursorDeadzoneEnabled = true;
+}
+
+void DisableCursorDeadzone()
+{
+	CursorDeadzoneEnabled = false;
 }
 
 bool ParseCommandLine(ConfigReader &config, int argc, char **argv)
@@ -196,92 +239,181 @@ int main(int argc, char** argv)
 
     config.print();
 
-	printf("Setting up..");
+	printf("Setting up..\n");
 	UltraleapPoller ulp;
+
+	ulp.indexPinchThreshold = config.GetIndexPinchThreshold();
+	ulp.boundsLeftM = config.GetBoundsLeftMeters();
+	ulp.boundsRightM = config.GetBoundsRightMeters();
+	ulp.boundsLowerM = config.GetBoundsLowerMeters();
+	ulp.boundsUpperM = config.GetBoundsUpperMeters();
+	ulp.boundsNearM = config.GetBoundsNearMeters();
+	ulp.boundsFarM = config.GetBoundsFarMeters();
+	ulp.limitTrackingToWithinBounds = config.GetLimitTrackingToWithinBounds();
 
 	if (config.GetFistToLiftActive())
 	{
-		ulp.SetOnFistStartCallback([](const LEAP_HAND &)
-								   { SetMouseActive(false); });
-		ulp.SetOnFistStopCallback([](const LEAP_HAND &)
-								  { SetMouseActive(true); });
+		ulp.SetOnFistStartCallback(
+			[](const int64_t timestamp, const LEAP_HAND &hand)
+			{
+				SetMouseActive(false);
+
+				FistStartTimestamp = timestamp;
+				FistStartPosition = hand.palm.position;
+				CancelFistRecentering = false;
+
+				// Double fist to recenter.
+				/*int64_t timeBetweenFists = timestamp - PrevFistTimestamp;
+				if (timeBetweenFists < SECONDS_TO_MICROSECONDS(1))
+				{
+					// Recenter the mouse
+					int w = GetScreenWidth();
+					int h = GetScreenHeight();
+					SetMouse(w / 2, h / 2);
+				}
+
+				PrevFistTimestamp = timestamp;*/
+			}
+		);
+		ulp.SetOnFistContinueCallback(
+			[&ulp](const int64_t timestamp, const LEAP_HAND& hand)
+			{
+				if (CancelFistRecentering)
+				{
+					return;
+				}
+
+				float distance = ulp.distance(FistStartPosition, hand.palm.position);
+				if (distance > METERS_TO_MILLIMETERS(FIST_RECENTER_DEADZONE_DISTANCE_METERS))
+				{
+					CancelFistRecentering = true;
+				}
+
+				int64_t timeSinceFistStart = timestamp - FistStartTimestamp;
+				if (timeSinceFistStart > SECONDS_TO_MICROSECONDS(FIST_RECENTER_HOLD_TIME_SECONDS))
+				{
+					CancelFistRecentering = true;
+
+					int w = GetScreenWidth();
+					int h = GetScreenHeight();
+					SetMouse(w / 2, h / 2);
+				}
+			}
+		);
+		ulp.SetOnFistStopCallback([](const int64_t timestamp, const LEAP_HAND &) {
+			SetMouseActive(true);
+		});
 	}
-	
-	// The following interferes with fist.
-	// The AlmostPinchStop callback fires 
-	// ulp.SetOnAlmostPinchStartCallback([](const LEAP_HAND&) { 
-	// 	SetMouseActive(false);
-	// 	});
-	// ulp.SetOnAlmostPinchStopCallback([](const LEAP_HAND&) {
-	// 	SetMouseActive(true);
-	// 	});
-	ulp.SetOnIndexPinchStartCallback([](const LEAP_HAND&) { 
-		PrimaryDown(); });
-	ulp.SetOnIndexPinchStopCallback([](const LEAP_HAND&) {
-		PrimaryUp(); });
-	ulp.SetOnAlmostRotateStartCallback([](const LEAP_HAND&) {
-        SetMouseActive(false);
+
+	ulp.SetOnIndexPinchStartCallback([](const int64_t timestamp, const LEAP_HAND &hand) {
+		PrimaryDown();
+		EnableCursorDeadzone(hand.palm.position);
+	});
+	ulp.SetOnIndexPinchStopCallback([](const int64_t timestamp, const LEAP_HAND&) {
+		PrimaryUp();
+		DisableCursorDeadzone();
+	});
+
+	ulp.SetOnAlmostRotateStartCallback([](const int64_t timestamp, const LEAP_HAND &hand) {
+		EnableCursorDeadzone(hand.palm.position);
     });
-	ulp.SetOnAlmostRotateStopCallback([](const LEAP_HAND&) {
-        SetMouseActive(true);
+	ulp.SetOnAlmostRotateStopCallback([](const int64_t timestamp, const LEAP_HAND&) {
+		// Not used
     });
 
 	if (config.GetRightClickActive())
 	{
-		ulp.SetOnRotateStartCallback([&config](const LEAP_HAND &)
-									 {
-			// printf("Rotate started\n");
-		SecondaryDown(); });
-		ulp.SetOnRotateStopCallback([](const LEAP_HAND &)
-									{
-			// printf("Rotate stopped\n");
-		SecondaryUp(); });
+		ulp.SetOnRotateStartCallback([&config](const int64_t timestamp, const LEAP_HAND &hand) {
+			SecondaryDown();
+			EnableCursorDeadzone(hand.palm.position);
+		});
+		ulp.SetOnRotateStopCallback([](const int64_t timestamp, const LEAP_HAND &) {
+			SecondaryUp();
+			DisableCursorDeadzone();
+		});
 	}
 
 	if (config.GetScrollingActive())
 	{
-		ulp.SetOnVStartCallback([](const LEAP_HAND &)
-								{ SetScrolling(true); });
-		ulp.SetOnVContinueCallback([&config](const LEAP_HAND &h)
-								   {
-									float palmToFingertipDist = h.middle.distal.next_joint.y - h.palm.position.y;
+		ulp.SetOnVStartCallback([](const int64_t timestamp, const LEAP_HAND &) {
+			SetScrolling(true);
+		});
+		ulp.SetOnVContinueCallback(
+			[&config](const int64_t timestamp, const LEAP_HAND &h)
+			{
+				float palmToFingertipDist = h.middle.distal.next_joint.y - h.palm.position.y;
 
-									float move = config.GetScrollingSpeed() * 2;
+				float move = config.GetScrollingSpeed();
+				float threshold = config.GetScrollThreshold();
 
-									if (palmToFingertipDist > 20.f)
-									{
-										VerticalScroll(static_cast<int>(move));
-									}
-									else if (palmToFingertipDist < -20.f)
-									{
-										VerticalScroll(static_cast<int>(-move));
-									} });
-		ulp.SetOnVStopCallback([](const LEAP_HAND &)
-							   { SetScrolling(false); });
+				if (palmToFingertipDist > threshold)
+				{
+					VerticalScroll(static_cast<int>(move));
+				}
+				else if (palmToFingertipDist < -threshold)
+				{
+					VerticalScroll(static_cast<int>(-move));
+				}
+			}
+		);
+		ulp.SetOnVStopCallback([](const int64_t timestamp, const LEAP_HAND &) {
+			SetScrolling(false);
+		});
 	}
 
-	ulp.SetPositionCallback([&config](LEAP_VECTOR v){ 
+	ulp.SetPositionCallback([&ulp, &config](LEAP_VECTOR v) {
 		if ((PrevPos.x == 0 && PrevPos.y == 0 && PrevPos.z == 0) || !MouseActive)
 		{
-		    // We want to do relative updates so skip this one so we have sensible numbers
+			// We want to do relative updates so skip this one so we have sensible numbers
 		}
-        else
-        {
+		else
+		{
+			if (CursorDeadzoneEnabled)
+			{
+				float deadzoneDistance = ulp.distance(CursorDeadzoneStartPosition, v);
+				if (deadzoneDistance > METERS_TO_MILLIMETERS(CURSOR_DEADZONE_THRESHOLD_METERS))
+				{
+					DisableCursorDeadzone();
+				}
+				return;
+			}
 
 			int xMove = static_cast<int>(config.GetSpeed() * (v.x - PrevPos.x));
 			float yMove = (v.y - PrevPos.y) * (config.GetVerticalOrientation() ? -1 : 1);
 
-		    // if (config.GetUseScrolling() && Scrolling)
-		    if (Scrolling && config.GetLockMouseOnScroll())
+			// if (config.GetUseScrolling() && Scrolling)
+			if (Scrolling && config.GetLockMouseOnScroll())
 			{
-		            // VerticalScroll(static_cast<int>(config.GetScrollingSpeed() * yMove));	     
+				// VerticalScroll(static_cast<int>(config.GetScrollingSpeed() * yMove));
 			}
 			else
 			{
-					MoveMouse(xMove, static_cast<int>(config.GetSpeed()* yMove));
+				if (config.GetUseAbsoluteMousePosition())
+				{
+					int w = GetScreenWidth();
+					int h = GetScreenHeight();
+
+					float boundsLower = config.GetBoundsLowerMeters();
+					float boundsUpper = config.GetBoundsUpperMeters();
+					float boundsLeft = config.GetBoundsLeftMeters();
+					float boundsRight = config.GetBoundsRightMeters();
+
+					int mouseX = remap(-boundsLeft, boundsRight, 0, w, MILLIMETERS_TO_METERS(v.x));
+					int mouseY = remap(boundsLower, boundsUpper, h, 0, MILLIMETERS_TO_METERS(v.y));
+
+					//printf("W: %f pos vs %i/%i pixels\n", MILLIMETERS_TO_METERS(v.x), mouseX, w);
+					//printf("H: %f pos vs %i/%i pixels\n\n", MILLIMETERS_TO_METERS(v.y), mouseY, h);
+
+					SetMouse(mouseX, mouseY);
+				}
+				else
+				{
+					MoveMouse(xMove, static_cast<int>(config.GetSpeed() * yMove));
+				}
 			}
 		}
-		PrevPos = v;    
+
+		PrevPos = v;
 	});
 	
 	ulp.StartPoller();

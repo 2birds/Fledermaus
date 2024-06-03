@@ -6,7 +6,7 @@
 #include <thread>
 
 typedef std::function<void(LEAP_VECTOR)> position_callback_t;
-typedef std::function<void(const LEAP_HAND&)> gesture_callback_t;
+typedef std::function<void(const int64_t, const LEAP_HAND&)> gesture_callback_t;
 
 class UltraleapPoller
 {
@@ -20,6 +20,12 @@ class UltraleapPoller
         // Fires on each update with a hand
         void SetPositionCallback(position_callback_t callback);
         void ClearPositionCallback();
+
+        float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
+
+        float indexPinchThreshold;
+        float boundsLeftM, boundsRightM, boundsLowerM, boundsUpperM, boundsNearM, boundsFarM;
+        bool limitTrackingToWithinBounds;
 
 // This macro sets up all callback setters and getters, tests, and flags related to a particular gesture..
 // EXCEPT the functions and values actually responsible for detecting the gesture.
@@ -36,7 +42,7 @@ class UltraleapPoller
         gesture_callback_t name##ContinueCallback_; \
         gesture_callback_t name##StopCallback_; \
         bool doing##name##_ = false; \
-        void name##Checks(const LEAP_HAND* hand); \
+        void name##Checks(const int64_t timestamp, const LEAP_HAND* hand); \
         bool is##name(const LEAP_HAND* hand) const; \
 
         AddGestureCallbackSetters(AlmostPinch);
@@ -52,10 +58,9 @@ class UltraleapPoller
 
     private:
         void runPoller();
-        float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
         LEAP_VECTOR difference(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
         float dot(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
-       float magnitude(const LEAP_VECTOR vec) const;
+        float magnitude(const LEAP_VECTOR vec) const;
 
         void handleDeviceMessage(const LEAP_DEVICE_EVENT *device_event);
         void handleTrackingMessage(const LEAP_TRACKING_EVENT *tracking_event);
@@ -63,11 +68,10 @@ class UltraleapPoller
     private:
         bool pollerRunning_ = false;
         const float pinchThreshold_ =  0.85f;
-        const float indexPinchThreshold_  =  35.f;
         const float middlePinchThreshold_ =  35.f;
         const float ringPinchThreshold_   =  25.f;
         const float pinkyPinchThreshold_  =  35.f;
-        const float fistThreshold_ =  0.9f;
+        const float fistThreshold_ =  0.5f;
         const float rotationThreshold_ = 20.f;
 
         position_callback_t positionCallback_;
