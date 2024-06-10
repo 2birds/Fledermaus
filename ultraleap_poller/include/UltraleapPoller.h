@@ -14,6 +14,9 @@ class UltraleapPoller
         UltraleapPoller();
         ~UltraleapPoller();
         
+        // Not all modes are supported. Returns "true" if we support it.
+        bool SetTrackingMode(const std::string& trackingMode);
+        
         void StartPoller();
         void StopPoller();
 
@@ -75,6 +78,9 @@ class UltraleapPoller
         const float rotationThreshold_ = 20.f;
 
         position_callback_t positionCallback_;
+
+        eLeapTrackingMode trackingMode_;
+        bool trackingModeDirty_ = false;
 
         LEAP_CONNECTION lc_;
         std::thread pollingThread_;

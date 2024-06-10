@@ -12,6 +12,7 @@
 
 bool MouseActive = true;
 bool Scrolling = false;
+int directionSwap = 1;
 
 int64_t PrevFistTimestamp;
 int64_t FistStartTimestamp;
@@ -251,6 +252,12 @@ int main(int argc, char** argv)
 	ulp.boundsFarM = config.GetBoundsFarMeters();
 	ulp.limitTrackingToWithinBounds = config.GetLimitTrackingToWithinBounds();
 
+	ulp.SetTrackingMode(config.GetTrackingMode());
+	if (config.GetTrackingMode() == "screentop")
+	{
+        directionSwap = -1;
+	}
+
 	if (config.GetFistToLiftActive())
 	{
 		ulp.SetOnFistStartCallback(
@@ -343,7 +350,7 @@ int main(int argc, char** argv)
 			{
 				float palmToFingertipDist = h.middle.distal.next_joint.y - h.palm.position.y;
 
-				float move = config.GetScrollingSpeed();
+				float move = config.GetScrollingSpeed() * directionSwap;
 				float threshold = config.GetScrollThreshold();
 
 				if (palmToFingertipDist > threshold)
@@ -378,8 +385,8 @@ int main(int argc, char** argv)
 				return;
 			}
 
-			int xMove = static_cast<int>(config.GetSpeed() * (v.x - PrevPos.x));
-			float yMove = (v.y - PrevPos.y) * (config.GetVerticalOrientation() ? -1 : 1);
+			int xMove = static_cast<int>(config.GetSpeed() * (v.x - PrevPos.x)) * directionSwap;
+			float yMove = (v.y - PrevPos.y) * (config.GetVerticalOrientation() ? -1 : 1) * directionSwap;
 
 			// if (config.GetUseScrolling() && Scrolling)
 			if (Scrolling && config.GetLockMouseOnScroll())

@@ -24,6 +24,7 @@
 #define BOUNDS_NEAR_NAME BoundsNearMeters
 #define BOUNDS_FAR_NAME BoundsFarMeters
 #define LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME LimitTrackingToWithinBounds
+#define LEAP_CAMERA_MODE TrackingMode
 
 #define STRINGIFY(x) #x
 #define STRINGIFY_HELPER(x) STRINGIFY(x)
@@ -57,6 +58,18 @@ namespace rjs=rapidjson;
         return TOKENPASTE(name, _); \
     }
 
+#define SETTERS_AND_GETTERS_STRING(name, default) private: \
+    std::string TOKENPASTE(name, _) = default; \
+    public: \
+    void TOKENPASTE(Set, name)(const std::string& name) \
+    { \
+        TOKENPASTE(name, _) = name; \
+    } \
+    std::string TOKENPASTE(Get, name) ##() \
+    { \
+        return TOKENPASTE(name, _); \
+    }
+
 class ConfigReader {
 
     SETTERS_AND_GETTERS_FLOAT(SPEED_NAME, 2.0f);
@@ -75,7 +88,8 @@ class ConfigReader {
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_UPPER_NAME, 0.35f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_NEAR_NAME, 0.15f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_FAR_NAME, 0.15f);
-    SETTERS_AND_GETTERS_BOOL(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, false)
+    SETTERS_AND_GETTERS_BOOL(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, false);
+    SETTERS_AND_GETTERS_STRING(LEAP_CAMERA_MODE, "desktop");
 
     private:
     std::string config_file_name_;
@@ -104,6 +118,15 @@ class ConfigReader {
         {
             printf("Couldn't find config file.\n");
         }
+
+        if (d_.HasMember(STRINGIFY_HELPER(LEAP_CAMERA_MODE)))
+        {
+            TOKENPASTE(LEAP_CAMERA_MODE, _) = d_[STRINGIFY_HELPER(LEAP_CAMERA_MODE)].GetString();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(LEAP_CAMERA_MODE));
+        }
     }
 
     ConfigReader() : ConfigReader(CONFIG_FILE_NAME)
@@ -130,6 +153,7 @@ class ConfigReader {
         printf( STRINGIFY_HELPER(BOUNDS_NEAR_NAME) ": %f\n", TOKENPASTE(BOUNDS_NEAR_NAME, _));
         printf( STRINGIFY_HELPER(BOUNDS_FAR_NAME) ": %f\n", TOKENPASTE(BOUNDS_FAR_NAME, _));
         printf( STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME) ": %s\n", TOKENPASTE(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, _) ? "true" : "false");
+	printf( STRINGIFY_HELPER(LEAP_CAMERA_MODE) ": %s\n", TOKENPASTE(LEAP_CAMERA_MODE, _.c_str()));
     }
 
     private:

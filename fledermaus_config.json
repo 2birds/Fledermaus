@@ -15,5 +15,6 @@
     "BoundsUpperMeters" : 0.35,
     "BoundsNearMeters" : 0.15,
     "BoundsFarMeters" : 0.15,
-    "LimitTrackingToWithinBounds" : false
+    "LimitTrackingToWithinBounds" : false,
+    "TrackingMode" : "desktop"
 }

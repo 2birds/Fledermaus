@@ -70,6 +70,8 @@ UltraleapPoller::UltraleapPoller()
 		printf("Could not open connection. Failed with error: %s", errno_to_string(res));
 		exit(EXIT_FAILURE);
 	}
+
+	trackingMode_ = eLeapTrackingMode_Desktop;
 }
 
 UltraleapPoller::~UltraleapPoller()
@@ -82,10 +84,29 @@ UltraleapPoller::~UltraleapPoller()
 	}	
 }
 
+bool UltraleapPoller::SetTrackingMode(const std::string& trackingMode)
+{
+	if (trackingMode == "desktop")
+	{
+		trackingMode_ = eLeapTrackingMode_Desktop;
+		trackingModeDirty_ = true;
+		return true;
+	}
+	else if (trackingMode == "screentop")
+	{
+		trackingMode_ = eLeapTrackingMode_ScreenTop;
+		trackingModeDirty_ = true;
+		return true;
+	}
+
+	return false;
+}
+
 void UltraleapPoller::StartPoller()
 {
 	pollerRunning_ = true;
     pollingThread_ = std::thread(&UltraleapPoller::runPoller, this);
+
 }
 
 void UltraleapPoller::StopPoller()
@@ -207,6 +228,16 @@ void UltraleapPoller::runPoller()
 		{
             continue;
 		}	
+
+		if (trackingModeDirty_)
+		{
+			if (eLeapRS_Success != LeapSetTrackingMode(lc_, trackingMode_))
+			{
+				printf("Failed to set tracking mode");
+			}
+
+			trackingModeDirty_ = false;
+		}
 		
 		switch (msg.type)
 		{
