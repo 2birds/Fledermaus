@@ -5,6 +5,7 @@
 #include "ConfigReader.h"
 #include "MouseControl.h"
 #include "UltraleapPoller.h"
+#include "MathUtils.h"
 
 #define SECONDS_TO_MICROSECONDS(seconds) seconds * 1000000
 #define METERS_TO_MILLIMETERS(meters) meters * 1000
@@ -26,23 +27,6 @@ LEAP_VECTOR CursorDeadzoneStartPosition;
 const float CURSOR_DEADZONE_THRESHOLD_METERS = 0.03f;
 
 LEAP_VECTOR PrevPos = {0, 0, 0};
-
-
-float lerp(float a, float b, float t)
-{
-	return (1.0f - t) * a + b * t;
-}
-
-float inverse_lerp(float a, float b, float v)
-{
-	return (v - a) / (b - a);
-}
-
-float remap(float iMin, float iMax, float oMin, float oMax, float v)
-{
-	float t = inverse_lerp(iMin, iMax, v);
-	return lerp(oMin, oMax, t);
-}
 
 void SetMouseActive(bool active)
 {
@@ -405,8 +389,8 @@ int main(int argc, char** argv)
 					float boundsLeft = config.GetBoundsLeftMeters();
 					float boundsRight = config.GetBoundsRightMeters();
 
-					int mouseX = remap(-boundsLeft, boundsRight, 0, w, MILLIMETERS_TO_METERS(v.x));
-					int mouseY = remap(boundsLower, boundsUpper, h, 0, MILLIMETERS_TO_METERS(v.y));
+					int mouseX = MathUtils::remap(-boundsLeft, boundsRight, 0, w, MILLIMETERS_TO_METERS(v.x));
+					int mouseY = MathUtils::remap(boundsLower, boundsUpper, h, 0, MILLIMETERS_TO_METERS(v.y));
 
 					//printf("W: %f pos vs %i/%i pixels\n", MILLIMETERS_TO_METERS(v.x), mouseX, w);
 					//printf("H: %f pos vs %i/%i pixels\n\n", MILLIMETERS_TO_METERS(v.y), mouseY, h);

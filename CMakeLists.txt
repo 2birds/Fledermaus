@@ -21,6 +21,7 @@ find_package(LeapSDK
 if (UNIX)    
     find_package(Threads REQUIRED)    
 endif (UNIX)
+add_subdirectory(math_utils)
 add_subdirectory(mouse_control)
 add_subdirectory(ultraleap_poller)
 
@@ -38,6 +39,7 @@ target_link_libraries(${PROJECT_NAME}
      PUBLIC
      LeapSDK::LeapC
      PRIVATE
+     math_utils
      mouse_control
      ultraleap_poller)
 
