@@ -8,6 +8,16 @@
 typedef std::function<void(LEAP_VECTOR)> position_callback_t;
 typedef std::function<void(const int64_t, const LEAP_HAND&)> gesture_callback_t;
 
+struct UltraleapBounds {
+    float leftM;
+    float rightM;
+    float lowerM;
+    float upperM;
+    float nearM;
+    float farM;
+    bool  limitTrackingToWithinBounds;
+};
+
 class UltraleapPoller
 {
     public:
@@ -26,9 +36,11 @@ class UltraleapPoller
 
         float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
 
-        float indexPinchThreshold;
-        float boundsLeftM, boundsRightM, boundsLowerM, boundsUpperM, boundsNearM, boundsFarM;
-        bool limitTrackingToWithinBounds;
+        void SetIndexPinchThreshold(const float thresh);
+
+        // float boundsLeftM, boundsRightM, boundsLowerM, boundsUpperM, boundsNearM, boundsFarM;
+        // bool limitTrackingToWithinBounds;
+        UltraleapBounds bounds;
 
 // This macro sets up all callback setters and getters, tests, and flags related to a particular gesture..
 // EXCEPT the functions and values actually responsible for detecting the gesture.
@@ -70,6 +82,7 @@ class UltraleapPoller
 
     private:
         bool pollerRunning_ = false;
+        float indexPinchThreshold_ = 0.f;
         const float pinchThreshold_ =  0.85f;
         const float middlePinchThreshold_ =  35.f;
         const float ringPinchThreshold_   =  25.f;

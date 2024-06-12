@@ -214,8 +214,24 @@ bool ParseCommandLine(ConfigReader &config, int argc, char **argv)
 	return true;
 }
 
+void setUltraleapPollerFromConfig(UltraleapPoller& ulp, const ConfigReader& cfg)
+{
+    ulp.SetIndexPinchThreshold(cfg.GetIndexPinchThreshold());
+
+    ulp.bounds = UltraleapBounds{cfg.GetBoundsLeftMeters(),
+                                 cfg.GetBoundsRightMeters(),
+                                 cfg.GetBoundsLowerMeters(),
+                                 cfg.GetBoundsUpperMeters(),
+                                 cfg.GetBoundsNearMeters(),
+                                 cfg.GetBoundsFarMeters(),
+                                 cfg.GetLimitTrackingToWithinBounds()};
+
+    ulp.SetTrackingMode(cfg.GetTrackingMode());
+}
+
 int main(int argc, char** argv)
 {
+	printf("%s\n", argv[0]);
 	ConfigReader config;
 	if (!ParseCommandLine(config, argc, argv))
 	{
@@ -227,16 +243,7 @@ int main(int argc, char** argv)
 	printf("Setting up..\n");
 	UltraleapPoller ulp;
 
-	ulp.indexPinchThreshold = config.GetIndexPinchThreshold();
-	ulp.boundsLeftM = config.GetBoundsLeftMeters();
-	ulp.boundsRightM = config.GetBoundsRightMeters();
-	ulp.boundsLowerM = config.GetBoundsLowerMeters();
-	ulp.boundsUpperM = config.GetBoundsUpperMeters();
-	ulp.boundsNearM = config.GetBoundsNearMeters();
-	ulp.boundsFarM = config.GetBoundsFarMeters();
-	ulp.limitTrackingToWithinBounds = config.GetLimitTrackingToWithinBounds();
-
-	ulp.SetTrackingMode(config.GetTrackingMode());
+    setUltraleapPollerFromConfig(ulp, config);
 	if (config.GetTrackingMode() == "screentop")
 	{
         directionSwap = -1;

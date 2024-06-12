@@ -41,7 +41,7 @@ namespace rjs=rapidjson;
     { \
         TOKENPASTE(name, _) = name; \
     } \
-    bool TOKENPASTE(Get, name)##() \
+    bool TOKENPASTE(Get, name)##() const \
     { \
         return TOKENPASTE(name, _); \
     }
@@ -53,7 +53,7 @@ namespace rjs=rapidjson;
     { \
         TOKENPASTE(name, _) = name; \
     } \
-    float TOKENPASTE(Get, name) ##() \
+    float TOKENPASTE(Get, name) ##() const \
     { \
         return TOKENPASTE(name, _); \
     }
@@ -65,7 +65,7 @@ namespace rjs=rapidjson;
     { \
         TOKENPASTE(name, _) = name; \
     } \
-    std::string TOKENPASTE(Get, name) ##() \
+    std::string TOKENPASTE(Get, name) ##() const \
     { \
         return TOKENPASTE(name, _); \
     }
