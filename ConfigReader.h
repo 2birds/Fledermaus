@@ -38,6 +38,7 @@
 #define BOUNDS_FAR_NAME BoundsFarMeters
 #define LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME LimitTrackingToWithinBounds
 #define LEAP_CAMERA_MODE TrackingMode
+#define HANDEDNESS Handedness
 
 #define STRINGIFY(x) #x
 #define STRINGIFY_HELPER(x) STRINGIFY(x)
@@ -103,6 +104,7 @@ class ConfigReader {
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_FAR_NAME, 0.15f);
     SETTERS_AND_GETTERS_BOOL(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, false);
     SETTERS_AND_GETTERS_STRING(LEAP_CAMERA_MODE, "desktop");
+    SETTERS_AND_GETTERS_STRING(HANDEDNESS, "both");
 
     private:
     std::string config_file_name_;
@@ -112,44 +114,17 @@ class ConfigReader {
     ConfigReader(std::string config_file_name) :
     config_file_name_(config_file_name)
     {
-        printf("Looking for config file at %s\n", config_file_name.c_str());
-        std::ifstream ifs(config_file_name_);
-
-        if (!ifs.fail())
-        {
-            std::string line;
-            std::stringstream ss;
-            while (std::getline(ifs, line))
-            {
-                ss << line;
-            }
-
-            d_.Parse(ss.str().c_str());
-
-            validateAndLoadJson(); 
-        }
-        else
-        {
-            printf("Error reading config file, using defaults.\n");
-        }
-
-        if (d_.HasMember(STRINGIFY_HELPER(LEAP_CAMERA_MODE)))
-        {
-            TOKENPASTE(LEAP_CAMERA_MODE, _) = d_[STRINGIFY_HELPER(LEAP_CAMERA_MODE)].GetString();
-        }
-        else
-        {
-            printf(STRINGIFY_HELPER(LEAP_CAMERA_MODE));
-        }
+        init();
     }
 
-    ConfigReader() : ConfigReader(CONFIG_FILE_NAME)
+    ConfigReader()
     {
         char configFilePath[PATH_LENGTH];
         getExecutableDirectory(configFilePath, PATH_LENGTH); 
         std::stringstream ss;
         ss << configFilePath << PATH_SEPARATOR << CONFIG_FILE_NAME;
-        ConfigReader(ss.str());
+        config_file_name_ = ss.str();
+        init();
     }
 
     ~ConfigReader() {}
@@ -173,10 +148,36 @@ class ConfigReader {
         printf( STRINGIFY_HELPER(BOUNDS_NEAR_NAME) ": %f\n", TOKENPASTE(BOUNDS_NEAR_NAME, _));
         printf( STRINGIFY_HELPER(BOUNDS_FAR_NAME) ": %f\n", TOKENPASTE(BOUNDS_FAR_NAME, _));
         printf( STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME) ": %s\n", TOKENPASTE(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, _) ? "true" : "false");
-	printf( STRINGIFY_HELPER(LEAP_CAMERA_MODE) ": %s\n", TOKENPASTE(LEAP_CAMERA_MODE, _.c_str()));
+        printf( STRINGIFY_HELPER(LEAP_CAMERA_MODE) ": %s\n", TOKENPASTE(LEAP_CAMERA_MODE, _.c_str()));
+        printf( STRINGIFY_HELPER(HANDEDNESS) ": %s\n", TOKENPASTE(HANDEDNESS, _.c_str()));
     }
 
     private:
+    void init()
+    {
+        printf("Looking for config file at %s\n", config_file_name_.c_str());
+        std::ifstream ifs(config_file_name_);
+
+        if (!ifs.fail())
+        {
+            std::string line;
+            std::stringstream ss;
+            while (std::getline(ifs, line))
+            {
+                ss << line;
+            }
+
+            d_.Parse(ss.str().c_str());
+
+            validateAndLoadJson(); 
+        }
+        else
+        {
+            printf("Error reading config file, using defaults.\n");
+            return;
+        }
+    }
+
     static size_t getExecutableDirectory(char* dest, size_t destLength)
     {
 #ifdef WIN32
@@ -362,6 +363,26 @@ class ConfigReader {
         else
         {
             printf(STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(LEAP_CAMERA_MODE)))
+        {
+            // assert(d_[STRINGIFY(LEAP_CAMERA_MODE)].IsBool());
+            TOKENPASTE(LEAP_CAMERA_MODE, _) = d_[STRINGIFY_HELPER(LEAP_CAMERA_MODE)].GetString();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(LEAP_CAMERA_MODE) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(HANDEDNESS)))
+        {
+            // assert(d_[STRINGIFY(HANDEDNESS)].IsBool());
+            TOKENPASTE(HANDEDNESS, _) = d_[STRINGIFY_HELPER(HANDEDNESS)].GetString();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(HANDEDNESS) " not found!\n");
         }
     }
 };

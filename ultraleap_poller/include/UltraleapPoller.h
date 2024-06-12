@@ -5,6 +5,10 @@
 #include <mutex>
 #include <thread>
 
+#define LEFT_HANDED "left"
+#define RIGHT_HANDED "right"
+#define BOTH_HANDED "both"
+
 typedef std::function<void(LEAP_VECTOR)> position_callback_t;
 typedef std::function<void(const int64_t, const LEAP_HAND&)> gesture_callback_t;
 
@@ -37,6 +41,7 @@ class UltraleapPoller
         float distance(const LEAP_VECTOR first, const LEAP_VECTOR second) const;
 
         void SetIndexPinchThreshold(const float thresh);
+        bool SetHandedness(const std::string& handedness);
 
         // float boundsLeftM, boundsRightM, boundsLowerM, boundsUpperM, boundsNearM, boundsFarM;
         // bool limitTrackingToWithinBounds;
@@ -89,6 +94,7 @@ class UltraleapPoller
         const float pinkyPinchThreshold_  =  35.f;
         const float fistThreshold_ =  0.5f;
         const float rotationThreshold_ = 20.f;
+        std::string handedness_ = BOTH_HANDED;
 
         position_callback_t positionCallback_;
 

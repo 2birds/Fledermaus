@@ -107,6 +107,19 @@ void UltraleapPoller::SetIndexPinchThreshold(const float thresh)
 	indexPinchThreshold_ = thresh;
 }
 
+bool UltraleapPoller::SetHandedness(const std::string& handedness)
+{
+	if (handedness != BOTH_HANDED &&
+	    handedness != LEFT_HANDED &&
+	    handedness != RIGHT_HANDED)
+	{
+		return false;
+	}
+
+	handedness_ = handedness;
+	return true;
+}
+
 void UltraleapPoller::StartPoller()
 {
 	pollerRunning_ = true;
@@ -213,7 +226,11 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 			}
 			else
 			{
-				activeHandID = hand.id;
+				if ((handedness_ != LEFT_HANDED && hand.type != eLeapHandType_Left) ||
+				    (handedness_ != RIGHT_HANDED && hand.type != eLeapHandType_Right))
+				{
+					activeHandID = hand.id;
+				}
 			}
 		}
   }

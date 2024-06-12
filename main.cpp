@@ -227,6 +227,10 @@ void setUltraleapPollerFromConfig(UltraleapPoller& ulp, const ConfigReader& cfg)
                                  cfg.GetLimitTrackingToWithinBounds()};
 
     ulp.SetTrackingMode(cfg.GetTrackingMode());
+	if (!ulp.SetHandedness(cfg.GetHandedness()))
+	{
+		printf("Unknown value for handedness, using default.\n");
+	}
 }
 
 int main(int argc, char** argv)
