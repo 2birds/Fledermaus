@@ -2,8 +2,21 @@
 
 #include "rapidjson/document.h"
 #include <fstream>
+#ifdef WIN32
+#include "windows.h"
+#include "libloaderapi.h"
+#include "shlwapi.h"
+#endif // WIN32
 #include <sstream>
 #include <string>
+
+#ifdef WIN32
+#define PATH_LENGTH MAX_PATH
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_LENGTH 500
+#define PATH_SEPARATOR "/"
+#endif
 
 #define CONFIG_FILE_NAME "fledermaus_config.json"
 
@@ -99,6 +112,7 @@ class ConfigReader {
     ConfigReader(std::string config_file_name) :
     config_file_name_(config_file_name)
     {
+        printf("Looking for config file at %s\n", config_file_name.c_str());
         std::ifstream ifs(config_file_name_);
 
         if (!ifs.fail())
@@ -116,7 +130,7 @@ class ConfigReader {
         }
         else
         {
-            printf("Couldn't find config file.\n");
+            printf("Error reading config file, using defaults.\n");
         }
 
         if (d_.HasMember(STRINGIFY_HELPER(LEAP_CAMERA_MODE)))
@@ -130,7 +144,13 @@ class ConfigReader {
     }
 
     ConfigReader() : ConfigReader(CONFIG_FILE_NAME)
-    {}
+    {
+        char configFilePath[PATH_LENGTH];
+        getExecutableDirectory(configFilePath, PATH_LENGTH); 
+        std::stringstream ss;
+        ss << configFilePath << PATH_SEPARATOR << CONFIG_FILE_NAME;
+        ConfigReader(ss.str());
+    }
 
     ~ConfigReader() {}
 
@@ -157,6 +177,21 @@ class ConfigReader {
     }
 
     private:
+    static size_t getExecutableDirectory(char* dest, size_t destLength)
+    {
+#ifdef WIN32
+    // This will break if we start dealing with unicode
+    // TCHAR is a char if using ANSI, a wide if using unicode
+    TCHAR path[PATH_LENGTH];
+    DWORD length = GetModuleFileName(NULL, path, MAX_PATH);
+    PathRemoveFileSpec(path);
+
+    strncpy(dest, reinterpret_cast<const char*>(path), static_cast<size_t>(length));
+
+    return static_cast<size_t>(length);
+#endif // WIN32
+    }
+
     void validateAndLoadJson()
     {
         if (d_.HasMember(STRINGIFY_HELPER(ORIENTATION_NAME )))

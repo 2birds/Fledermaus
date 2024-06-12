@@ -35,13 +35,20 @@ target_include_directories(${PROJECT_NAME}
                            PRIVATE
                            "rapidjson/include")
 
+set(link_libraries
+    math_utils
+    mouse_control
+    ultraleap_poller)
+
+if(WIN32)
+    list(APPEND link_libraries shlwapi)
+endif(WIN32)
+
 target_link_libraries(${PROJECT_NAME}
      PUBLIC
      LeapSDK::LeapC
      PRIVATE
-     math_utils
-     mouse_control
-     ultraleap_poller)
+     ${link_libraries})
 
 get_target_property(
 	LEAPC_IMPORTED_CONFIG
