@@ -308,7 +308,7 @@ void UltraleapPoller::ClearOn##name##StopCallback() \
 } \
 void UltraleapPoller::name##Checks(const int64_t timestamp, const LEAP_HAND* hand) \
 { \
-  if (is##name##(hand)) \
+  if (is##name(hand)) \
   { \
 		if (doing##name##_) \
 		{ \

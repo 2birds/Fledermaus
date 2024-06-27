@@ -55,7 +55,7 @@ namespace rjs=rapidjson;
     { \
         TOKENPASTE(name, _) = name; \
     } \
-    bool TOKENPASTE(Get, name)##() const \
+    bool TOKENPASTE(Get, name) () const \
     { \
         return TOKENPASTE(name, _); \
     }
@@ -67,7 +67,7 @@ namespace rjs=rapidjson;
     { \
         TOKENPASTE(name, _) = name; \
     } \
-    float TOKENPASTE(Get, name) ##() const \
+    float TOKENPASTE(Get, name) () const \
     { \
         return TOKENPASTE(name, _); \
     }
@@ -79,7 +79,7 @@ namespace rjs=rapidjson;
     { \
         TOKENPASTE(name, _) = name; \
     } \
-    std::string TOKENPASTE(Get, name) ##() const \
+    std::string TOKENPASTE(Get, name) () const \
     { \
         return TOKENPASTE(name, _); \
     }
@@ -95,7 +95,7 @@ class ConfigReader {
     SETTERS_AND_GETTERS_BOOL(RIGHT_CLICK_ACTIVE_NAME, true);
     SETTERS_AND_GETTERS_BOOL(FIST_TO_LIFT_NAME, true);
     SETTERS_AND_GETTERS_FLOAT(INDEX_PINCH_THRESHOLD_NAME, 35.0f);
-    SETTERS_AND_GETTERS_BOOL(USE_ABSOLUTE_MOUSE_POSITION, true);
+    SETTERS_AND_GETTERS_BOOL(USE_ABSOLUTE_MOUSE_POSITION, false);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_LEFT_NAME, 0.25f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_RIGHT_NAME, 0.25f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_LOWER_NAME, 0.10f);
