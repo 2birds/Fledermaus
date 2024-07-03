@@ -3,7 +3,7 @@ Fledermaus
 
 Flying mouse. Get it?
 
-Use hand tracking to control your mouse cursor.
+Use Ultraleap hand tracking to control your mouse cursor.
 
 Controls
 --------
