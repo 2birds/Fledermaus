@@ -2,8 +2,21 @@
 
 #include "rapidjson/document.h"
 #include <fstream>
+#ifdef WIN32
+#include "windows.h"
+#include "libloaderapi.h"
+#include "shlwapi.h"
+#endif // WIN32
 #include <sstream>
 #include <string>
+
+#ifdef WIN32
+#define PATH_LENGTH MAX_PATH
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_LENGTH 500
+#define PATH_SEPARATOR "/"
+#endif
 
 #define CONFIG_FILE_NAME "fledermaus_config.json"
 
@@ -24,6 +37,8 @@
 #define BOUNDS_NEAR_NAME BoundsNearMeters
 #define BOUNDS_FAR_NAME BoundsFarMeters
 #define LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME LimitTrackingToWithinBounds
+#define LEAP_CAMERA_MODE TrackingMode
+#define HANDEDNESS Handedness
 
 #define STRINGIFY(x) #x
 #define STRINGIFY_HELPER(x) STRINGIFY(x)
@@ -40,7 +55,7 @@ namespace rjs=rapidjson;
     { \
         TOKENPASTE(name, _) = name; \
     } \
-    bool TOKENPASTE(Get, name)##() \
+    bool TOKENPASTE(Get, name) () const \
     { \
         return TOKENPASTE(name, _); \
     }
@@ -52,7 +67,19 @@ namespace rjs=rapidjson;
     { \
         TOKENPASTE(name, _) = name; \
     } \
-    float TOKENPASTE(Get, name) ##() \
+    float TOKENPASTE(Get, name) () const \
+    { \
+        return TOKENPASTE(name, _); \
+    }
+
+#define SETTERS_AND_GETTERS_STRING(name, default) private: \
+    std::string TOKENPASTE(name, _) = default; \
+    public: \
+    void TOKENPASTE(Set, name)(const std::string& name) \
+    { \
+        TOKENPASTE(name, _) = name; \
+    } \
+    std::string TOKENPASTE(Get, name) () const \
     { \
         return TOKENPASTE(name, _); \
     }
@@ -68,14 +95,16 @@ class ConfigReader {
     SETTERS_AND_GETTERS_BOOL(RIGHT_CLICK_ACTIVE_NAME, true);
     SETTERS_AND_GETTERS_BOOL(FIST_TO_LIFT_NAME, true);
     SETTERS_AND_GETTERS_FLOAT(INDEX_PINCH_THRESHOLD_NAME, 35.0f);
-    SETTERS_AND_GETTERS_BOOL(USE_ABSOLUTE_MOUSE_POSITION, true);
+    SETTERS_AND_GETTERS_BOOL(USE_ABSOLUTE_MOUSE_POSITION, false);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_LEFT_NAME, 0.25f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_RIGHT_NAME, 0.25f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_LOWER_NAME, 0.10f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_UPPER_NAME, 0.35f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_NEAR_NAME, 0.15f);
     SETTERS_AND_GETTERS_FLOAT(BOUNDS_FAR_NAME, 0.15f);
-    SETTERS_AND_GETTERS_BOOL(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, false)
+    SETTERS_AND_GETTERS_BOOL(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, false);
+    SETTERS_AND_GETTERS_STRING(LEAP_CAMERA_MODE, "desktop");
+    SETTERS_AND_GETTERS_STRING(HANDEDNESS, "both");
 
     private:
     std::string config_file_name_;
@@ -85,29 +114,18 @@ class ConfigReader {
     ConfigReader(std::string config_file_name) :
     config_file_name_(config_file_name)
     {
-        std::ifstream ifs(config_file_name_);
-
-        if (!ifs.fail())
-        {
-            std::string line;
-            std::stringstream ss;
-            while (std::getline(ifs, line))
-            {
-                ss << line;
-            }
-
-            d_.Parse(ss.str().c_str());
-
-            validateAndLoadJson(); 
-        }
-        else
-        {
-            printf("Couldn't find config file.\n");
-        }
+        init();
     }
 
-    ConfigReader() : ConfigReader(CONFIG_FILE_NAME)
-    {}
+    ConfigReader()
+    {
+        char configFilePath[PATH_LENGTH];
+        getExecutableDirectory(configFilePath, PATH_LENGTH); 
+        std::stringstream ss;
+        ss << configFilePath << PATH_SEPARATOR << CONFIG_FILE_NAME;
+        config_file_name_ = ss.str();
+        init();
+    }
 
     ~ConfigReader() {}
 
@@ -130,9 +148,51 @@ class ConfigReader {
         printf( STRINGIFY_HELPER(BOUNDS_NEAR_NAME) ": %f\n", TOKENPASTE(BOUNDS_NEAR_NAME, _));
         printf( STRINGIFY_HELPER(BOUNDS_FAR_NAME) ": %f\n", TOKENPASTE(BOUNDS_FAR_NAME, _));
         printf( STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME) ": %s\n", TOKENPASTE(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME, _) ? "true" : "false");
+        printf( STRINGIFY_HELPER(LEAP_CAMERA_MODE) ": %s\n", TOKENPASTE(LEAP_CAMERA_MODE, _.c_str()));
+        printf( STRINGIFY_HELPER(HANDEDNESS) ": %s\n", TOKENPASTE(HANDEDNESS, _.c_str()));
     }
 
     private:
+    void init()
+    {
+        printf("Looking for config file at %s\n", config_file_name_.c_str());
+        std::ifstream ifs(config_file_name_);
+
+        if (!ifs.fail())
+        {
+            std::string line;
+            std::stringstream ss;
+            while (std::getline(ifs, line))
+            {
+                ss << line;
+            }
+
+            d_.Parse(ss.str().c_str());
+
+            validateAndLoadJson(); 
+        }
+        else
+        {
+            printf("Error reading config file, using defaults.\n");
+            return;
+        }
+    }
+
+    static size_t getExecutableDirectory(char* dest, size_t destLength)
+    {
+#ifdef WIN32
+    // This will break if we start dealing with unicode
+    // TCHAR is a char if using ANSI, a wide if using unicode
+    TCHAR path[PATH_LENGTH];
+    DWORD length = GetModuleFileName(NULL, path, MAX_PATH);
+    PathRemoveFileSpec(path);
+
+    strncpy(dest, reinterpret_cast<const char*>(path), static_cast<size_t>(length));
+
+    return static_cast<size_t>(length);
+#endif // WIN32
+    }
+
     void validateAndLoadJson()
     {
         if (d_.HasMember(STRINGIFY_HELPER(ORIENTATION_NAME )))
@@ -303,6 +363,26 @@ class ConfigReader {
         else
         {
             printf(STRINGIFY_HELPER(LIMIT_TRACKING_TO_WITHIN_BOUNDS_NAME) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(LEAP_CAMERA_MODE)))
+        {
+            // assert(d_[STRINGIFY(LEAP_CAMERA_MODE)].IsBool());
+            TOKENPASTE(LEAP_CAMERA_MODE, _) = d_[STRINGIFY_HELPER(LEAP_CAMERA_MODE)].GetString();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(LEAP_CAMERA_MODE) " not found!\n");
+        }
+
+        if (d_.HasMember(STRINGIFY_HELPER(HANDEDNESS)))
+        {
+            // assert(d_[STRINGIFY(HANDEDNESS)].IsBool());
+            TOKENPASTE(HANDEDNESS, _) = d_[STRINGIFY_HELPER(HANDEDNESS)].GetString();
+        }
+        else
+        {
+            printf(STRINGIFY_HELPER(HANDEDNESS) " not found!\n");
         }
     }
 };

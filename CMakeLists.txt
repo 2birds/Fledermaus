@@ -21,6 +21,7 @@ find_package(LeapSDK
 if (UNIX)    
     find_package(Threads REQUIRED)    
 endif (UNIX)
+add_subdirectory(math_utils)
 add_subdirectory(mouse_control)
 add_subdirectory(ultraleap_poller)
 
@@ -34,12 +35,20 @@ target_include_directories(${PROJECT_NAME}
                            PRIVATE
                            "rapidjson/include")
 
+set(link_libraries
+    math_utils
+    mouse_control
+    ultraleap_poller)
+
+if(WIN32)
+    list(APPEND link_libraries shlwapi)
+endif(WIN32)
+
 target_link_libraries(${PROJECT_NAME}
      PUBLIC
      LeapSDK::LeapC
      PRIVATE
-     mouse_control
-     ultraleap_poller)
+     ${link_libraries})
 
 get_target_property(
 	LEAPC_IMPORTED_CONFIG

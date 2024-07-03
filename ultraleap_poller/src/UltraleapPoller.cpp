@@ -70,6 +70,8 @@ UltraleapPoller::UltraleapPoller()
 		printf("Could not open connection. Failed with error: %s", errno_to_string(res));
 		exit(EXIT_FAILURE);
 	}
+
+	trackingMode_ = eLeapTrackingMode_Desktop;
 }
 
 UltraleapPoller::~UltraleapPoller()
@@ -82,10 +84,47 @@ UltraleapPoller::~UltraleapPoller()
 	}	
 }
 
+bool UltraleapPoller::SetTrackingMode(const std::string& trackingMode)
+{
+	if (trackingMode == "desktop")
+	{
+		trackingMode_ = eLeapTrackingMode_Desktop;
+		trackingModeDirty_ = true;
+		return true;
+	}
+	else if (trackingMode == "screentop")
+	{
+		trackingMode_ = eLeapTrackingMode_ScreenTop;
+		trackingModeDirty_ = true;
+		return true;
+	}
+
+	return false;
+}
+
+void UltraleapPoller::SetIndexPinchThreshold(const float thresh)
+{
+	indexPinchThreshold_ = thresh;
+}
+
+bool UltraleapPoller::SetHandedness(const std::string& handedness)
+{
+	if (handedness != BOTH_HANDED &&
+	    handedness != LEFT_HANDED &&
+	    handedness != RIGHT_HANDED)
+	{
+		return false;
+	}
+
+	handedness_ = handedness;
+	return true;
+}
+
 void UltraleapPoller::StartPoller()
 {
 	pollerRunning_ = true;
     pollingThread_ = std::thread(&UltraleapPoller::runPoller, this);
+
 }
 
 void UltraleapPoller::StopPoller()
@@ -151,11 +190,11 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 				else
 				{
 					//printf("x=%f, y=%f, z=%f\n", hand.palm.position.x, hand.palm.position.y, hand.palm.position.z);
-					if (limitTrackingToWithinBounds)
+					if (bounds.limitTrackingToWithinBounds)
 					{
-						if (hand.palm.position.x * 0.001f < -boundsLeftM || hand.palm.position.x * 0.001f > boundsRightM
-							|| hand.palm.position.y * 0.001f < -boundsLowerM || hand.palm.position.y * 0.001f > boundsUpperM
-							|| hand.palm.position.z * 0.001f > boundsNearM || hand.palm.position.z * 0.001f < -boundsFarM)
+						if (hand.palm.position.x * 0.001f < -bounds.leftM || hand.palm.position.x * 0.001f > bounds.rightM
+							|| hand.palm.position.y * 0.001f < -bounds.lowerM || hand.palm.position.y * 0.001f > bounds.upperM
+							|| hand.palm.position.z * 0.001f > bounds.nearM || hand.palm.position.z * 0.001f < -bounds.farM)
 						{
 							continue;
 						}
@@ -187,7 +226,11 @@ void UltraleapPoller::handleTrackingMessage(const LEAP_TRACKING_EVENT* tracking_
 			}
 			else
 			{
-				activeHandID = hand.id;
+				if ((handedness_ != LEFT_HANDED && hand.type != eLeapHandType_Left) ||
+				    (handedness_ != RIGHT_HANDED && hand.type != eLeapHandType_Right))
+				{
+					activeHandID = hand.id;
+				}
 			}
 		}
   }
@@ -207,6 +250,16 @@ void UltraleapPoller::runPoller()
 		{
             continue;
 		}	
+
+		if (trackingModeDirty_)
+		{
+			if (eLeapRS_Success != LeapSetTrackingMode(lc_, trackingMode_))
+			{
+				printf("Failed to set tracking mode");
+			}
+
+			trackingModeDirty_ = false;
+		}
 		
 		switch (msg.type)
 		{
@@ -255,7 +308,7 @@ void UltraleapPoller::ClearOn##name##StopCallback() \
 } \
 void UltraleapPoller::name##Checks(const int64_t timestamp, const LEAP_HAND* hand) \
 { \
-  if (is##name##(hand)) \
+  if (is##name(hand)) \
   { \
 		if (doing##name##_) \
 		{ \
@@ -342,10 +395,10 @@ bool UltraleapPoller::isPinch(const LEAP_HAND* hand) const
 
 bool UltraleapPoller::isIndexPinch(const LEAP_HAND* hand) const
 {
-	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  < indexPinchThreshold &&
-	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > indexPinchThreshold &&
-	       distance(hand->ring.distal.next_joint, hand->thumb.distal.next_joint)   > indexPinchThreshold &&
-	       distance(hand->pinky.distal.next_joint, hand->thumb.distal.next_joint)  > indexPinchThreshold;
+	return distance(hand->index.distal.next_joint, hand->thumb.distal.next_joint)  < indexPinchThreshold_ &&
+	       distance(hand->middle.distal.next_joint, hand->thumb.distal.next_joint) > indexPinchThreshold_ &&
+	       distance(hand->ring.distal.next_joint, hand->thumb.distal.next_joint)   > indexPinchThreshold_ &&
+	       distance(hand->pinky.distal.next_joint, hand->thumb.distal.next_joint)  > indexPinchThreshold_;
 }
 
 
