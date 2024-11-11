@@ -4,6 +4,8 @@ project(Fledermaus LANGUAGES CXX VERSION 1.0.0.0)
 if (WIN32)
    set(ULTRALEAP_PATH_ROOT "$ENV{ProgramFiles}/Ultraleap")
 elseif (APPLE)
+	message(FATAL_ERROR "OSX support is still under developement")
+
    set(ULTRALEAP_PATH_ROOT "/Library/Application\ Support/Ultraleap/LeapSDK/lib/cmake/LeapSDK")
 else()
    # Linux and other OSs
