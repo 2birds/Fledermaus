@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.20)
 project(Fledermaus LANGUAGES CXX VERSION 1.0.0.0)
 
+set(CMAKE_CXX_STANDARD 11)
+
 if (WIN32)
    set(ULTRALEAP_PATH_ROOT "$ENV{ProgramFiles}/Ultraleap")
 elseif (APPLE)
-	message(FATAL_ERROR "OSX support is still under developement")
+	# message(FATAL_ERROR "OSX support is still under developement")
 
-   set(ULTRALEAP_PATH_ROOT "/Library/Application\ Support/Ultraleap/LeapSDK/lib/cmake/LeapSDK")
+   # set(ULTRALEAP_PATH_ROOT "/Library/Application\ Support/Ultraleap/LeapSDK/lib/cmake/LeapSDK")
+   set(ULTRALEAP_PATH_ROOT "/Applications/Ultraleap\ Hand\ Tracking.app/Contents/LeapSDK/lib/cmake")
 else()
    # Linux and other OSs
    set(ULTRALEAP_PATH_ROOT "")
