@@ -28,13 +28,18 @@ bool SetMouse(int x, int y)
     return true;
 }
 
+// Untested
 int GetScreenWidth()
 {
-    return 1;
+    CGDirectDisplayID id = CGMainDisplayID();
+    return static_cast<size_t>(CGDisplayPixelsWide(id));
 }
+
+// Untested
 int GetScreenHeight()
 {
-    return 1;
+    CGDirectDisplayID id = CGMainDisplayID();
+    return static_cast<size_t>(CGDisplayPixelsHigh(id));
 }
 
 bool PrimaryDown()
